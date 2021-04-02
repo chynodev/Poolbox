@@ -1,0 +1,17 @@
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = "Reader";
+}
+
+<div id="GridDiv">
+    <h1>HELOOO</h1>
+
+</div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new PoolBox.PoolBox.ReaderGrid($('#GridDiv'), {}).init();
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

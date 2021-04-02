@@ -1,0 +1,23 @@
+{
+  "RootNamespace": "PoolBox",
+  "ServerTypings": {
+    "LocalTexts": true
+  },
+  "Connections": [
+    {
+      "Key": "Default",
+      "Tables": [
+        {
+          "Tablename": "dbo.TRANSLATIONS",
+          "Identifier": "Translations",
+          "Module": "PoolBox",
+          "PermissionKey": "Administration:General"
+        }
+      ]
+    }
+  ],
+  "UpgradeInfo": {
+    "InitialType": "Community",
+    "InitialVersion": "5.0.24.0"
+  }
+}
