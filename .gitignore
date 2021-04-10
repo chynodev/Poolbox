@@ -7,6 +7,7 @@ PoolBox.Web/wwwroot/Content/site/site.css
 PoolBox.Web/App_data
 PoolBox.Web/Modules/Northwind
 PoolBox.Web/Modules/BasicSamples
+APIkeys.json
 
 
 ## Ignore Visual Studio temporary files, build results, and
