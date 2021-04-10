@@ -19,6 +19,7 @@ namespace PoolBox.PoolBox {
             this.slickGrid.destroy();
 
             this.gridContainer = document.querySelector('.grid-container');
+            this.gridContainer.setAttribute('id', 'reader-grid');
             this.addPasteFromClipboardEventListener();
         }
 
@@ -26,11 +27,26 @@ namespace PoolBox.PoolBox {
 
             window.addEventListener("paste", e => {
                 this.clipboardText = (<ClipboardEvent>e).clipboardData.getData('Text');
-                console.log(this.clipboardText);
 
-                this.gridContainer.innerHTML = this.clipboardText.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                this.gridContainer.innerHTML = TextFormatter.wrapWordsInSpanElement(this.clipboardText);
 
             }, false)
         }
+
+        // override
+        protected usePager() {
+            return false;
+        }
+
+        //protected fetchWordData() {
+            
+
+        //    Q.serviceCall({
+        //        url: 
+        //    });
+        //}
+
+        //private readonly spanishDictApi = 'https://www.dictionaryapi.com/api/v3/references/spanish/json/';
+        //private readonly spanishDictApiKey = 'c5eeee9e-cf36-4114-b565-1416e8c1296b';
     }
 }

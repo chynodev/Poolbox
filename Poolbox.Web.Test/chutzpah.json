@@ -1,0 +1,29 @@
+{
+  "Framework": "jasmine",
+  "Compile": {
+    "Mode": "External",
+    "Extensions": [
+      ".ts"
+    ],
+    "ExtensionsWithNoOutput": [
+      ".d.ts"
+    ]
+  },
+  "CodeCoverageExcludes": [
+    "*.spec.ts"
+  ],
+  "References": [],
+  "Tests": [
+    {
+      "Path": "app",
+      "Includes": [
+        "*/*.spec.ts"
+      ],
+      "Excludes": [
+        "*/*.d.ts",
+        "*/**.spec.js"
+      ],
+      "ExpandReferenceComments": "true"
+    }
+  ]
+}
