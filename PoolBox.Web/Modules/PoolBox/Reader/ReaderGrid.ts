@@ -21,6 +21,7 @@ namespace PoolBox.PoolBox {
             this.gridContainer = document.querySelector('.grid-container');
             this.gridContainer.setAttribute('id', 'reader-grid');
             this.addPasteFromClipboardEventListener();
+            this.setReaderOnClickAction();
         }
 
         protected addPasteFromClipboardEventListener() {
@@ -38,15 +39,41 @@ namespace PoolBox.PoolBox {
             return false;
         }
 
-        //protected fetchWordData() {
-            
+        protected setReaderOnClickAction() {
+            this.gridContainer.addEventListener('click', e => {
+               let target = e.target as Element;
 
-        //    Q.serviceCall({
-        //        url: 
-        //    });
-        //}
+                if (target.classList.contains('word'))
+                    this.fetchTextData(target.innerHTML);
+            });
+        }
 
-        //private readonly spanishDictApi = 'https://www.dictionaryapi.com/api/v3/references/spanish/json/';
-        //private readonly spanishDictApiKey = 'c5eeee9e-cf36-4114-b565-1416e8c1296b';
+        
+
+        protected fetchTextData(text: string) {
+
+            var req: Requests.TranslationRequest = { Word: text }
+
+            ReaderService.Translate(req, (data) => {
+                let [type, gender] = DictionaryParsers.SpanishParser.getWordTypeAndGender(JSON.parse(data.Data));
+                console.log(type);
+                console.log(gender);
+            });
+
+            // felicidad
+            //$.getJSON(my_url, myCallback);
+            //$.ajax({
+            //    url: `${this.spanishDictApi}${text}?key=${this.spanishDictApiKey}`,
+            //    method: 'GET',
+            //    dataType: 'jsonp',
+            //    //jsonpCallback: 'foo',
+            //    success: function (data) { console.log(data.responseJSON ?? 'the dictionary api didn\'t return data'); },
+            //    error: function (x, err, q) { console.log(err); console.log('error ' + q);}
+            //});
+        }
+
     }
 }
+
+
+

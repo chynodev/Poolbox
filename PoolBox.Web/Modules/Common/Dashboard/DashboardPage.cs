@@ -12,7 +12,7 @@ namespace PoolBox.Common.Pages
     [Route("Dashboard/[action]")]
     public class DashboardController : Controller
     {
-        [PageAuthorize, HttpGet, Route("~/")]
+        [PageAuthorize, HttpGet]
         public ActionResult Index(
             [FromServices] ITwoLevelCache cache,
             [FromServices] ISqlConnections sqlConnections
