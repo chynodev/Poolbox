@@ -42,18 +42,26 @@ namespace PoolBox.PoolBox.Entities
             set => fields.PairId[this] = value;
         }
 
-        [DisplayName("Pair Translate From"), Expression("jPair.[TRANSLATE_FROM]")]
-        public String PairTranslateFrom
+        [DisplayName("Noun Gender"), Column("NOUN_GENDER"), Size(50)]
+        public String NounGender
         {
-            get => fields.PairTranslateFrom[this];
-            set => fields.PairTranslateFrom[this] = value;
+            get => fields.NounGender[this];
+            set => fields.NounGender[this] = value;
         }
 
-        [DisplayName("Pair Translate To"), Expression("jPair.[TRANSLATE_TO]")]
-        public String PairTranslateTo
+        [DisplayName("WordType"), Column("WORD_TYPE"), Size(50), NotNull]
+        public String WordType
         {
-            get => fields.PairTranslateTo[this];
-            set => fields.PairTranslateTo[this] = value;
+            get => fields.WordType[this];
+            set => fields.WordType[this] = value;
+        }
+
+
+        [DisplayName("User OD"), Column("USER_ID"), NotNull]
+        public Int32? UserId
+        {
+            get => fields.UserId[this];
+            set => fields.UserId[this] = value;
         }
 
         public TranslationsRow()
@@ -70,11 +78,12 @@ namespace PoolBox.PoolBox.Entities
         {
             public Int64Field TrId;
             public StringField Original;
+            public StringField NounGender;
+            public StringField WordType;
             public StringField Translated;
             public Int64Field PairId;
+            public Int32Field UserId;
 
-            public StringField PairTranslateFrom;
-            public StringField PairTranslateTo;
         }
     }
 }

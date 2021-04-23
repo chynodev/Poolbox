@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using RestSharp;
 using PoolBox.Responses;
 using PoolBox.Requests;
+using PoolBox.PoolBox.DictionaryServices;
 
 namespace PoolBox.PoolBox.Endpoints
 {
@@ -17,7 +18,7 @@ namespace PoolBox.PoolBox.Endpoints
         [HttpPost]
         public TranslationResponse Translate(TranslationRequest req)
         {
-            var client = new RestClient($"https://www.dictionaryapi.com/api/v3/references/spanish/json/{req.Word}?key=c5eeee9e-cf36-4114-b565-1416e8c1296b");
+            var client = new RestClient(DictionaryApi.Spanish(req.Word));
             var request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
 

@@ -48,28 +48,26 @@ namespace PoolBox.PoolBox {
             });
         }
 
-        
-
         protected fetchTextData(text: string) {
-
             var req: Requests.TranslationRequest = { Word: text }
 
-            ReaderService.Translate(req, (data) => {
-                let [type, gender] = DictionaryParsers.SpanishParser.getWordTypeAndGender(JSON.parse(data.Data));
-                console.log(type);
-                console.log(gender);
-            });
+            ReaderService.Translate(req, (response) => {
+                let respJson = JSON.parse(response.Data);
+                let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
+                entity.Original = text;
 
-            // felicidad
-            //$.getJSON(my_url, myCallback);
-            //$.ajax({
-            //    url: `${this.spanishDictApi}${text}?key=${this.spanishDictApiKey}`,
-            //    method: 'GET',
-            //    dataType: 'jsonp',
-            //    //jsonpCallback: 'foo',
-            //    success: function (data) { console.log(data.responseJSON ?? 'the dictionary api didn\'t return data'); },
-            //    error: function (x, err, q) { console.log(err); console.log('error ' + q);}
-            //});
+                if ('shortdef' in respJson[0]) {
+                    let req: Serenity.SaveRequest<TranslationsRow> = {
+                        Entity: entity
+                    };
+
+                    TranslationsService.Create(
+                        req,
+                        response => console.log('Word successfully added to database')
+                    );
+                }
+
+            });
         }
 
     }

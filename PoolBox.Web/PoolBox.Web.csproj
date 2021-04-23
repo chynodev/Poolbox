@@ -13,8 +13,11 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\**\*.sql" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <None Remove="Modules\Common\Helpers\ExtensionMethods.ts" />
     <None Remove="Modules\Common\Helpers\TextFormatter.ts" />
-    <None Remove="Modules\PoolBox\DictionaryParsers\SpanishParser.ts" />
+    <None Remove="Modules\PoolBox\DictionaryServices\DictionaryParserAbstraction.ts" />
+    <None Remove="Modules\PoolBox\DictionaryServices\IWordData.ts" />
+    <None Remove="Modules\PoolBox\DictionaryServices\SpanishParser.ts" />
     <None Remove="Modules\PoolBox\Reader\ReaderGrid.ts" />
     <None Update="wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -39,18 +42,17 @@
     </PackageReference>
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="StackExchange.Exceptional.AspNetCore" Version="2.1.0" />
-    <PackageReference Include="Serenity.Net.Web" Version="5.0.24" />
-    <PackageReference Include="Serenity.Assets" Version="5.0.21" />
     <PackageReference Include="Serenity.Scripts" Version="5.0.24" />
     <PackageReference Include="Serenity.Demo.ThemeSamples" Version="5.0.20.1" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Core\Serenity.Net.Core.csproj" />
-    <ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Data\Serenity.Net.Data.csproj" />
-    <ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
-    <ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Services\Serenity.Net.Services.csproj" />
-    <ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Assets\Serenity.Assets.csproj" />
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Data\Serenity.Net.Data.csproj" />
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Services\Serenity.Net.Services.csproj" />
+		<ProjectReference Include="..\Serenity\Serenity\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
+	</ItemGroup>
   <Import Project="$(SolutionDir)Serenity\build\submodule.targets" Condition="Exists('$(SolutionDir)Serenity\build\submodule.targets')" />
   <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
     <CreateItem Include="Modules\**\*.ts;Imports\**\*.ts">
