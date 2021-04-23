@@ -5,6 +5,7 @@ using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using MyRepository = PoolBox.PoolBox.Repositories.TranslationsRepository;
 using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
+using System;
 
 namespace PoolBox.PoolBox.Endpoints
 {
@@ -15,6 +16,9 @@ namespace PoolBox.PoolBox.Endpoints
         [HttpPost, AuthorizeCreate(typeof(MyRow))]
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
+            request.Entity.UserId = Int32.Parse(Context.User.GetIdentifier());
+            request.Entity.PairId = 2;
+            
             return new MyRepository(Context).Create(uow, request);
         }
 

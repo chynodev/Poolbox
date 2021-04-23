@@ -12,7 +12,7 @@
     "outFile": "wwwroot/Scripts/site/PoolBox.Web.js",
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "target": "es6",
+    "target": "es5",
     "typeRoots": [
       "./node_modules/@types/"
     ]

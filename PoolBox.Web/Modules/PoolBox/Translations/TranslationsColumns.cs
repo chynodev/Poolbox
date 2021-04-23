@@ -17,6 +17,5 @@ namespace PoolBox.PoolBox.Columns
         [EditLink]
         public String Original { get; set; }
         public String Translated { get; set; }
-        public String PairTranslateFrom { get; set; }
     }
 }
