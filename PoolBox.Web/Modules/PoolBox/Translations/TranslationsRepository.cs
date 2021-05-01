@@ -1,4 +1,6 @@
-﻿using Serenity;
+﻿using PoolBox.Common;
+using PoolBox.Common.Repositories;
+using Serenity;
 using Serenity.Data;
 using Serenity.Services;
 using System;
@@ -18,6 +20,9 @@ namespace PoolBox.PoolBox.Repositories
 
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
+            request.Entity.UserId = Int32.Parse(Context.User.GetIdentifier());
+            request.Entity.PairId = 2;
+
             return new MySaveHandler(Context).Process(uow, request, SaveRequestType.Create);
         }
 
@@ -70,6 +75,22 @@ namespace PoolBox.PoolBox.Repositories
             public MyListHandler(IRequestContext context)
                 : base(context)
             {
+            }
+
+            protected override void ApplyEqualityFilter(SqlQuery query)
+            {
+                base.ApplyEqualityFilter(query);
+
+                var languagePairId = new UserPreferenceRepository(Context)
+                    .Retrieve(
+                        Connection,
+                        new UserPreferenceRetrieveRequest { PreferenceType = "LanguagePairPreference", Name = "Language pair ID" }
+                    ).Value;
+
+                query.Where(
+                    new Criteria(MyRow.Fields.UserId) == Context.User.GetIdentifier()
+                    && new Criteria(MyRow.Fields.PairId) == languagePairId
+                );
             }
         }
     }

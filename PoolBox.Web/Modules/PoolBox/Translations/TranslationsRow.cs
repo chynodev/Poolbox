@@ -28,7 +28,7 @@ namespace PoolBox.PoolBox.Entities
             set => fields.Original[this] = value;
         }
 
-        [DisplayName("Translated"), Column("TRANSLATED"), Size(50), NotNull]
+        [DisplayName("Translated"), Column("TRANSLATED"), Size(150), NotNull]
         public String Translated
         {
             get => fields.Translated[this];
