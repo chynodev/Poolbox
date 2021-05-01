@@ -12,6 +12,10 @@ namespace PoolBox.PoolBox {
 
         constructor(container: JQuery) {
             super(container);
+
+            let currentLng = new Common.LanguagePairPreference().getItem();
         }
+
+
     }
 }

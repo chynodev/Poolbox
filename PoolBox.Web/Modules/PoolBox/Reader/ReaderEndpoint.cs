@@ -7,11 +7,12 @@ using RestSharp;
 using PoolBox.Responses;
 using PoolBox.Requests;
 using PoolBox.PoolBox.DictionaryServices;
+using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
 
 namespace PoolBox.PoolBox.Endpoints
 {
     [Route("Services/PoolBox/Reader/[action]")]
-    //[ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
+    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class ReaderController : ServiceEndpoint
     {
 
