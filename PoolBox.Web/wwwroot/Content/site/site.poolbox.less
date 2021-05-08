@@ -8,10 +8,27 @@
 
 .word {
     background-color: red;
+    padding: 1px;
 }
 
 
 #reader-grid {
     font-size: 18px;
+    line-height: 30px;
     overflow: auto !important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+// translated text
+.selected-text {
+    background-color: forestgreen;
+}
+
+// highlighted text during mouse over
+.highlighted-text {
+    background-color: yellowgreen;
 }
