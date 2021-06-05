@@ -11,6 +11,8 @@ namespace PoolBox.PoolBox {
         //protected getService() { return TranslationsService.baseUrl; }
 
         protected gridContainer: HTMLElement;
+        protected wordPanelElement: HTMLElement;
+        protected gridPanelContainer: HTMLElement;
         protected clipboardText: string;
         protected isMouseKeyPressed: boolean = false;
         protected highlightStart: number;
@@ -22,12 +24,11 @@ namespace PoolBox.PoolBox {
             super(container);
 
             this.slickGrid.destroy();
-
             this.gridContainer = document.querySelector('.grid-container');
             this.gridContainer.setAttribute('id', 'reader-grid');
             this.addPasteFromClipboardEventListener();
             this.setReaderMouseActions();
-
+            this.insertReaderBeforeWordPanel();
         }
 
         protected addPasteFromClipboardEventListener() {
@@ -74,6 +75,10 @@ namespace PoolBox.PoolBox {
                     if (isTextSelected) {
                         this.textHighlighter.selectHighlightedText();
                         this.highlightStart = this.highlightEnd = -1;
+
+                        let selectedWords = this.textHighlighter.getSelectedWordsArray();
+                        if (selectedWords.length === 1)
+                            this.fetchDictionaryData(selectedWords[0]);
                     }
                     this.isMouseKeyPressed = false;
                 }
@@ -102,24 +107,31 @@ namespace PoolBox.PoolBox {
             });
         }
 
-        protected fetchTextData(text: string) {
+        protected fetchDictionaryData(text: string) {
             var req: Requests.TranslationRequest = { Word: text }
+
+            // TODO: get current language and call service based on it
 
             ReaderService.Translate(req, (response) => {
                 let respJson = JSON.parse(response.Data);
                 let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
-                entity.Original = text;
 
-                if ('shortdef' in respJson[0]) {
-                    let req: Serenity.SaveRequest<TranslationsRow> = {
-                        Entity: entity
-                    };
+                this.wordPanelElement.querySelector('.word-type').innerHTML = entity.wordType;
+                this.wordPanelElement.querySelector('.translations').innerHTML = entity.translations;
+                this.wordPanelElement.querySelector('.noun-gender').innerHTML = entity.nounGender;
 
-                    TranslationsService.Create(
-                        req,
-                        response => console.log('Word successfully added to database')
-                    );
-                }
+                //entity.Original = text;
+
+                //if ('shortdef' in respJson[0]) {
+                //    let req: Serenity.SaveRequest<TranslationsRow> = {
+                //        Entity: entity
+                //    };
+
+                //    TranslationsService.Create(
+                //        req,
+                //        response => console.log('Word successfully added to database')
+                //    );
+                //}
 
             });
         }
@@ -127,6 +139,15 @@ namespace PoolBox.PoolBox {
         // override
         protected usePager() {
             return false;
+        }
+
+        protected insertReaderBeforeWordPanel() {
+            this.wordPanelElement = document.querySelector('#word-info-panel');
+            this.gridPanelContainer = document.querySelector('#grid-panel-container');
+            this.gridPanelContainer.insertBefore(this.gridContainer, this.wordPanelElement);
+
+            this.element[0].appendChild(this.gridPanelContainer);
+            this.gridContainer.classList.add('col-md-9');
         }
     }
 

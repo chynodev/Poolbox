@@ -6,7 +6,7 @@
         private static isLetter(letter: string): boolean {
             let unicode = letter.charCodeAt(0);
             const isBetween = (min, max) => min <= unicode && unicode <= max;
-
+            // TODO: russian alphabet is not recognized as valid
             return isBetween(65, 90) || isBetween(97, 122) || isBetween(192, 214)
                 || isBetween(216, 246) || isBetween(248, 447) || isBetween(452, 591);
         }
