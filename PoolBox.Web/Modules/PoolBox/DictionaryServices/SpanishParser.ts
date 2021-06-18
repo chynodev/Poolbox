@@ -10,10 +10,10 @@
             SpanishParser.wordTypes.forEach(item => type = wordType?.isSubstr(item) ? item.trim() : type);
             SpanishParser.genders.forEach(item => gender = wordType?.isSubstr(item) ? item.trim() : gender);
 
-            let entity: PoolBox.TranslationsRow = {
-                WordType: type,
-                NounGender: gender,
-                Translated: translations.join(', ')
+            let entity: DictionaryTranslationRow = {
+                wordType: type,
+                nounGender: gender,
+                translations: translations.join(', ')
             };
 
             return entity;

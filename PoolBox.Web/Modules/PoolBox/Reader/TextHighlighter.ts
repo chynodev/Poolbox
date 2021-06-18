@@ -3,6 +3,7 @@
         private words: HTMLWordElement[] = [];
         private readonly highlightedTxtClass = "highlighted-text";
         private readonly selectedTxtClass = "selected-text";
+        private selectedText: string[] = [];
 
         constructor(words: NodeListOf<HTMLWordElement>) {
             this.toArray(words);
@@ -19,7 +20,6 @@
         // highlights max 10 words
         public highlightText(startIdx: number, endIdx: number): string[] {
             let counter = 1;
-            let selectedText: string[] = [];
 
             if (endIdx < startIdx) {
                 for (let idx = startIdx; idx >= endIdx; idx--, counter--) {
@@ -29,7 +29,7 @@
                         this.unHighlightText(startIdx, startIdx);
                         return null;
                     }
-                    selectedText.unshift(this.words[idx].innerHTML);
+                    this.selectedText.unshift(this.words[idx].innerHTML);
                 }
                 this.unHighlightToRight(startIdx);
             } else {
@@ -40,11 +40,11 @@
                         this.unHighlightText(startIdx, startIdx);
                         return null;
                     }
-                    selectedText.push(this.words[idx].innerHTML);
+                    this.selectedText.push(this.words[idx].innerHTML);
                 }
                 this.unHighlightToLeft(startIdx);
             }
-            return selectedText;
+            return this.selectedText;
         }
 
         // un-highlights text from startIdx to endIdx
@@ -88,6 +88,10 @@
                     word.classList.add(this.selectedTxtClass);
                 }
             });
+        }
+
+        public getSelectedWordsArray() {
+            return this.selectedText;
         }
     }
 }

@@ -19,13 +19,15 @@ namespace PoolBox.PoolBox.Endpoints
         [HttpPost]
         public TranslationResponse Translate(TranslationRequest req)
         {
-            var client = new RestClient(DictionaryApi.Spanish(req.Word));
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
+            //var client = new RestClient(DictionaryApi.Spanish(req.Word));
+            //var request = new RestRequest(Method.GET);
+            ////request.AddHeader("X-Secret", "d97217da1a241ac82473506a61ad3e8674a6a85bad406a0f4ebc28b1525904c9");
+            //IRestResponse response = client.Execute(request);
 
-            var resp = new TranslationResponse { Data = response.Content};
+            //var resp = new TranslationResponse { Data = response.Content};
 
-            return resp;
+            //return resp;
+            return new TranslationResponse();
         }
         //[HttpPost, AuthorizeCreate(typeof(MyRow))]
         //public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)

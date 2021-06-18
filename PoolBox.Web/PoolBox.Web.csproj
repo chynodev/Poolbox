@@ -21,6 +21,7 @@
     <None Remove="Modules\PoolBox\DictionaryServices\SpanishParser.ts" />
     <None Remove="Modules\PoolBox\Reader\ReaderGrid.ts" />
     <None Remove="Modules\PoolBox\Reader\TextHighlighter.ts" />
+    <None Remove="Modules\PoolBox\Reader\WordInfoPanel.ts" />
     <None Update="wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

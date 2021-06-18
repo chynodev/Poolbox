@@ -10,33 +10,34 @@ namespace PoolBox.PoolBox {
         //protected getLocalTextPrefix() { return TranslationsRow.localTextPrefix; }
         //protected getService() { return TranslationsService.baseUrl; }
 
-        protected gridContainer: HTMLElement;
+        protected elements: ReaderElements;
         protected clipboardText: string;
         protected isMouseKeyPressed: boolean = false;
         protected highlightStart: number;
         protected highlightEnd: number;
         private readonly highlightedTxtClass = "highlighted-text";
         protected textHighlighter: TextHighlighter;
+        protected wordInfoPanel: WordInfoPanel;
 
         constructor(container: JQuery) {
             super(container);
 
             this.slickGrid.destroy();
-
-            this.gridContainer = document.querySelector('.grid-container');
-            this.gridContainer.setAttribute('id', 'reader-grid');
+            this.wordInfoPanel = new WordInfoPanel($('#word-info-panel'));
+            this.elements = new ReaderElements();
+            this.elements.grid.setAttribute('id', 'reader-grid');   
             this.addPasteFromClipboardEventListener();
             this.setReaderMouseActions();
-
+            this.insertReaderBeforeWordPanel();
         }
 
         protected addPasteFromClipboardEventListener() {
             window.addEventListener("paste", e => {
                 this.clipboardText = (<ClipboardEvent>e).clipboardData.getData('Text');
 
-                this.gridContainer.innerHTML = TextFormatter.wrapWordsInSpanElement(this.clipboardText);
+                this.elements.grid.innerHTML = TextFormatter.wrapWordsInSpanElement(this.clipboardText);
 
-                let words = this.gridContainer.querySelectorAll('.word') as NodeListOf<HTMLWordElement>;
+                let words = this.elements.grid.querySelectorAll('.word') as NodeListOf<HTMLWordElement>;
                 this.textHighlighter = new TextHighlighter(words);
 
             }, false)
@@ -49,7 +50,7 @@ namespace PoolBox.PoolBox {
         }
 
         protected setReaderOnMouseDownAction() {
-            this.gridContainer.addEventListener('mousedown', e => {
+            this.elements.grid.addEventListener('mousedown', e => {
                 let target = e.target as HTMLWordElement;
                 let selectedText: string[] = [];
 
@@ -67,13 +68,17 @@ namespace PoolBox.PoolBox {
         }
 
         protected setReaderOnMouseUpAction() {
-            this.gridContainer.addEventListener('mouseup', e => {
+            this.elements.grid.addEventListener('mouseup', e => {
                 const isTextSelected = [undefined, null, -1].every(x => x !== this.highlightStart && x !== this.highlightEnd);
 
                 if (e.button === 0) {
                     if (isTextSelected) {
+                        let selectedWords = this.elements.grid.querySelectorAll(`.${this.highlightedTxtClass}`);
                         this.textHighlighter.selectHighlightedText();
                         this.highlightStart = this.highlightEnd = -1;
+
+                        if (selectedWords.length === 1)
+                            this.fetchDictionaryData(selectedWords[0].innerHTML);
                     }
                     this.isMouseKeyPressed = false;
                 }
@@ -81,7 +86,7 @@ namespace PoolBox.PoolBox {
         }
 
         protected setReaderMouseOverAction() {
-            this.gridContainer.addEventListener('mouseover', e => {
+            this.elements.grid.addEventListener('mouseover', e => {
                 let target = e.target as HTMLWordElement;
                 let selectedText: string[] = [];
 
@@ -102,31 +107,55 @@ namespace PoolBox.PoolBox {
             });
         }
 
-        protected fetchTextData(text: string) {
-            var req: Requests.TranslationRequest = { Word: text }
+        protected fetchDictionaryData(word: string) {
+            var req: Requests.TranslationRequest = { Word: word }
+
+            // TODO: get current language and call service based on it
 
             ReaderService.Translate(req, (response) => {
+                //console.log(JSON.parse(response.Data));
                 let respJson = JSON.parse(response.Data);
-                let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
-                entity.Original = text;
+                //let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
 
-                if ('shortdef' in respJson[0]) {
-                    let req: Serenity.SaveRequest<TranslationsRow> = {
-                        Entity: entity
-                    };
+                this.updateWordInfoPanel(word);
 
-                    TranslationsService.Create(
-                        req,
-                        response => console.log('Word successfully added to database')
-                    );
-                }
+                //entity.Original = text;
+
+                //if ('shortdef' in respJson[0]) {
+                //    let req: Serenity.SaveRequest<TranslationsRow> = {
+                //        Entity: entity
+                //    };
+
+                //    TranslationsService.Create(
+                //        req,
+                //        response => console.log('Word successfully added to database')
+                //    );
+                //}
 
             });
+        }
+
+        protected updateWordInfoPanel(word: string) {
+            if (this.elements.wordPanel.style.visibility == 'hidden')
+                this.elements.wordPanel.style.visibility = 'visible';
+
+            this.elements.wordName.innerHTML = word;//entity.wordType;
+            //this.wordPanelElement.querySelector('#word-type').innerHTML = 'Ucho';//entity.wordType;
+            //this.wordPanelElement.querySelector('#translations').innerHTML = 'Moto';//entity.translations;
+            //this.wordPanelElement.querySelector('#noun-gender').innerHTML = 'Foto';//entity.nounGender;
         }
 
         // override
         protected usePager() {
             return false;
+        }
+
+        protected insertReaderBeforeWordPanel() {
+            this.elements.reader.appendChild(this.elements.grid);
+            this.elements.readerAndPanel.insertBefore(this.elements.reader, this.elements.wordPanel);
+
+            this.element[0].appendChild(this.elements.readerAndPanel);
+            this.elements.grid.classList.add('box', 'box-primary');
         }
     }
 
@@ -136,7 +165,13 @@ namespace PoolBox.PoolBox {
         }
     }
 
-    
+    class ReaderElements {
+        public wordPanel = document.querySelector('#word-info-panel') as HTMLElement;
+        public readerAndPanel = document.querySelector('#grid-panel-container') as HTMLElement;
+        public reader = document.querySelector('#reader-container') as HTMLElement;
+        public wordName = document.querySelector('#word-name') as HTMLElement;
+        public grid = document.querySelector('.grid-container') as HTMLElement;
+    }
 
 }
 
