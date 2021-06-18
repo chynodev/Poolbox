@@ -20,7 +20,6 @@ namespace PoolBox
     {
         private static readonly string[] databaseKeys = new[] {
             "Default"
-            , "Northwind"
         };
 
         protected ISqlConnections SqlConnections { get; }

@@ -3,22 +3,15 @@
     ViewData["Title"] = "Reader";
 }
 
-<div id="GridDiv">
+<div id="GridDiv" style="background-color: #ecf0f5;">
 
 </div>
 
 <div id="grid-panel-container" class="row">
-    
-    <div id="word-info-panel" class="col-md-3">
-        delobuch
-        <h1>Type</h1>
-        <h6 id="word-type"></h6>
-        <h1>Gender</h1>
-        <h6 id="noun-gender"></h6>
-        <h1>Translations</h1>
-        <h6 id="translations"></h6>
+        <div id="reader-container" class="col-md-9"></div>
+
+        <div id="word-info-panel" class="col-md-3" style="visibility: visible"></div>
     </div>
-</div>
 
 <script type="text/javascript">
     jQuery(function () {
