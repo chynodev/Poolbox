@@ -43,6 +43,42 @@ namespace PoolBox.PoolBox {
             }, false)
         }
 
+        protected fileFormatAndCheck(
+            request: Requests.FileImportRequest,
+            onSuccess?: (response: Responses.FileImportResponse) => void,
+            opt?: Q.ServiceOptions<any>): Responses.FileImportResponse {
+            return <Responses.FileImportResponse>FileImporterService.GetUploadedFileText(request, onSuccess, opt);
+        }
+
+        protected renderFileContents(response: Responses.FileImportResponse): void {
+            this.elements.grid.innerHTML = TextFormatter.wrapWordsInSpanElement(response.Text);
+            let words = this.elements.grid.querySelectorAll('.word') as NodeListOf<HTMLWordElement>;
+            this.textHighlighter = new TextHighlighter(words);
+        }
+
+        // ----override
+        protected getButtons() {
+            let buttons = super.getButtons();
+
+            buttons.push({
+                cssClass: 'export-pdf-button',
+                hint: 'Read text from PDF file',
+                title: 'Import PDF file',
+                onClick: () => {
+                    var dialog = new PoolBox.FileImportDialog(this.fileFormatAndCheck, this.renderFileContents.bind(this));
+                    dialog.element.on('dialogclose',
+                        () => {
+                            this.refresh();
+                            dialog = null;
+                        });
+                    dialog.dialogOpen();
+                },
+                separator: true
+            });
+
+            return buttons;
+        }
+
         protected setReaderMouseActions() {
             this.setReaderMouseOverAction();
             this.setReaderOnMouseDownAction();
