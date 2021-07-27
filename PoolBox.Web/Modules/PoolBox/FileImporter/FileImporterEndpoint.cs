@@ -1,8 +1,5 @@
-﻿//using iText.Kernel.Pdf;
-using iTextSharp.text.pdf;
+﻿using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
-//using iText.Kernel.Pdf.Canvas.Parser;
-//using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Microsoft.AspNetCore.Mvc;
 using PoolBox.PoolBox.Entities;
 using PoolBox.Requests;

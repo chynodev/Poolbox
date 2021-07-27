@@ -1,0 +1,77 @@
+﻿<style>
+    .select-option {
+        transition: 0.3s;
+        list-style: none;
+        border: 1px solid #ddd;
+        padding: 5px 7px;
+        margin-bottom: 10px;
+        width: 70%;
+        background-color: #3c8dbc;
+        color: white;
+        cursor: pointer;
+        width: 350px;
+    }
+
+    .selected {
+        background-color: #4ba3d3 !important;
+        color: white !important;
+    }
+
+    .select-option.deck-option {
+        display: inline-block;
+        margin-right: 20px;
+        width: auto;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    ul {
+        padding-left: 0;
+    }
+
+    #continue-btn {
+        color: white !important;
+        border-radius: 3px !important;
+        border: 2px solid white !important;
+        background-color: black !important;
+        font-weight: 600 !important;
+        transition: 0.4s color, 0.4s background, 0.4s border !important;
+    }
+
+</style>
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h1 id="word-name" class="box-title">Select deck size</h1>
+    </div><!-- /.box-header -->
+    <div class="box-body box-profile">
+        <ul class="row" style="margin-top: 10px">
+            <li class="select-option deck-option okta-btn-design" data-word-count="8">Review 8 words</li>
+            <li class="select-option deck-option okta-btn-design" data-word-count="15">Review 15 words</li>
+            <li class="select-option deck-option okta-btn-design" data-word-count="25">Review 25 words</li>
+        </ul>
+    </div>
+    <div class="box-header with-border" style="margin-top: 15px">
+        <h1 id="word-name" class="box-title">Select the direction of displaying flashcards</h1>
+    </div>
+    <div class="box-body box-profile">
+        <ul>
+            <li class="select-option direction-option okta-btn-design" data-card-direction="1">
+                <h4>Standard</h4>
+                <p>Flashcards initially show words in the language you know</p>
+            </li>
+            <li class="select-option direction-option okta-btn-design" data-card-direction="2">
+                <h4>Reversed</h4>
+                <p>Flashcards initially show words in the language you learn</p>
+            </li>
+            <li class="select-option direction-option okta-btn-design" data-card-direction="3">
+                <h4>Bidirectional</h4>
+                <p>Flashcards are shown twice by displaying each side</p>
+            </li>
+        </ul>
+
+        <button id="continue-btn" type="button" class="btn">Continue</button>
+    </div>
+</div>

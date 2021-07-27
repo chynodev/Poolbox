@@ -22,8 +22,9 @@ namespace PoolBox.PoolBox {
         constructor(container: JQuery) {
             super(container);
 
+            this.setTitle('Reader');
             this.slickGrid.destroy();
-            this.wordInfoPanel = new WordInfoPanel($('#word-info-panel'));
+            this.wordInfoPanel = new WordInfoPanel($('#word-info-panel'), { hideToolbar: true, title: '' });
             this.elements = new ReaderElements();
             this.elements.grid.setAttribute('id', 'reader-grid');   
             this.addPasteFromClipboardEventListener();

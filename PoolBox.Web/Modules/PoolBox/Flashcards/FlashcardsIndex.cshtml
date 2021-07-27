@@ -1,0 +1,106 @@
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = "Flashcards";
+}
+
+<style>
+    #flashcards-panel-container {
+        height: 100%;
+        display: none;
+    }
+
+    #word-info-panel {
+        visibility: visible;
+    }
+
+    #flashcards-wrapper {
+        border-radius: 3px;
+        background: #ffffff;
+        border-top: 3px solid #3c8dbc;
+        box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+        height: 100%;
+    }
+
+    #DeckSizeSelection {
+        width: 100%;
+    }
+
+    #top-flashcard, #bottom-flashcard{
+        margin: 0;
+        height: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+    }
+
+    #bottom-flashcard {
+        justify-content: normal;
+    }
+
+    #show-translation-btn {
+        background-color: #3c8dbc;
+        padding: 25px;
+        color: white;
+        border: none;
+    }
+
+    #show-translation-btn:hover {
+        background-color: #337ab7;
+    }
+
+    #recall-btns-container > * {
+        padding: 0 30px;
+        display: inline-block;
+        font-size: 15px;
+        height: 50px;
+        display: inline-block;
+        line-height: 46px;
+    }
+
+
+
+    #medium-btn {
+        margin: 0 15px;
+    }
+
+    #recall-btns-container, #translated-word-wrapper {
+        visibility: hidden;
+    }
+
+</style>
+
+<div id="GridDiv" style="background-color: #ecf0f5;">
+
+</div>
+
+<div id="flashcards-panel-container" class="row">
+    <div id="flashcards-wrapper" class="col-md-9" >
+        <div id="top-flashcard">
+            <div class="word-wrapper">Some Word</div>
+        </div>
+        <hr />
+        <div id="bottom-flashcard">
+            <div id="translated-word-wrapper" class="word-wrapper">Some translation</div>
+            <button id="show-translation-btn">Show translation</button>
+            <div id="recall-btns-container">
+                <button id="bad-btn" class="okta-btn-design">Bad</button>
+                <button id="medium-btn" class="okta-btn-design">Medium</button>
+                <button id="good-btn" class="okta-btn-design">Good</button>
+            </div>
+        </div>
+    </div >
+
+    <div id="word-info-panel" class="col-md-3"> </div >
+</div>
+
+<div id="DeckSizeSelection"> </div >
+
+<script type="text/javascript" >
+jQuery(function () {
+    new PoolBox.PoolBox.FlashcardsGrid($('#GridDiv'), {}).init();
+
+    Q.initFullHeightGridPage($('#GridDiv'));
+});
+</script >
