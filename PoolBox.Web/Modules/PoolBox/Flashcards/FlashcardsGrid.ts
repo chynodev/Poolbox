@@ -14,14 +14,15 @@ namespace PoolBox.PoolBox {
         protected selectedDeckSize: number;
         protected selectedFlashcardDirection: FlashcardDirection;
         protected wordInfoPanel: WordInfoPanel;
-        protected cardDeck: object[];
+        protected cardDeck: TranslationsRow[];
+        protected languagePairId: number;
 
         constructor(container: JQuery) {
             super(container);
 
             this.setTitle('Flashcards');
             this.slickGrid.destroy();
-            let currentLng = new Common.LanguagePairPreference().getItem();
+            this.languagePairId = parseInt(new Common.LanguagePairPreference().getItem());
             this.elements = new PageElements();
             this.initWordInfoPanel();
             this.initDeckSizeSelectionComponent();
@@ -37,7 +38,7 @@ namespace PoolBox.PoolBox {
                     this.selectedDeckSize = deckSize;
                     this.selectedFlashcardDirection = direction;
                     this.elements.flashcardsAndPanel.style.display = 'block';
-                    // this.myService().fetchCards();
+                    this.fetchCardDeck();
                 }).bind(this)
             );
         }
@@ -46,6 +47,21 @@ namespace PoolBox.PoolBox {
             this.wordInfoPanel = new WordInfoPanel(
                 $('#word-info-panel'),
                 { hideToolbar: false, title: 'Edit translation' }
+            );
+        }
+
+        protected fetchCardDeck() {
+            var req: Serenity.ListRequest = {
+                Take: this.selectedDeckSize,
+                Criteria: Serenity.Criteria.and(
+                    [[TranslationsRow.Fields.Username], '=', Authorization.userDefinition.Username],
+                    [[TranslationsRow.Fields.PairId], '=', this.languagePairId],
+                    [[TranslationsRow.Fields.DueDate], '<=', new Date()]
+                )
+            }
+            TranslationsService.List(
+                req,
+                (response) => this.cardDeck = response.Entities
             );
         }
 
