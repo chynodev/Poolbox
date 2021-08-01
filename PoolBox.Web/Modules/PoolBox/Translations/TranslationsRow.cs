@@ -57,11 +57,39 @@ namespace PoolBox.PoolBox.Entities
         }
 
 
-        [DisplayName("User OD"), Column("USER_ID"), NotNull]
+        [DisplayName("User ID"), Column("USER_ID"), NotNull, ForeignKey("[dbo].[Users]", "UserId"), LeftJoin("jUser")]
         public Int32? UserId
         {
             get => fields.UserId[this];
             set => fields.UserId[this] = value;
+        }
+
+        [DisplayName("Username"), Expression("jUser.Username")]
+        public String Username
+        {
+            get => fields.Username[this];
+            set => fields.Username[this] = value;
+        }
+
+        [DisplayName("Due date"), Column("DUE_DATE"), NotNull]
+        public DateTime? DueDate
+        {
+            get => fields.DueDate[this];
+            set => fields.DueDate[this] = value;
+        }
+
+        [DisplayName("Easiness Factor"), Column("EASINESS_FACTOR"), NotNull]
+        public Single? EasinessFactor
+        {
+            get => fields.EasinessFactor[this];
+            set => fields.EasinessFactor[this] = value;
+        }
+
+        [DisplayName("Repetition"), Column("REPETITION"), NotNull]
+        public Int32? Repetition
+        {
+            get => fields.Repetition[this];
+            set => fields.Repetition[this] = value;
         }
 
         public TranslationsRow()
@@ -83,7 +111,10 @@ namespace PoolBox.PoolBox.Entities
             public StringField Translated;
             public Int64Field PairId;
             public Int32Field UserId;
-
+            public StringField Username;
+            public DateTimeField DueDate;
+            public SingleField EasinessFactor;
+            public Int32Field Repetition;
         }
     }
 }
