@@ -1,46 +1,62 @@
-﻿//using Serenity;
-//using Serenity.Data;
-//using Serenity.Services;
-//using System.Data;
-//using Microsoft.AspNetCore.Mvc;
-//using MyRepository = PoolBox.PoolBox.Repositories.TranslationsRepository;
-//using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
-//using System;
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System.Data;
+using Microsoft.AspNetCore.Mvc;
+using MyRepository = PoolBox.PoolBox.Repositories.TranslationsRepository;
+using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
+using System;
+using PoolBox.Requests;
 
-//namespace PoolBox.PoolBox.Endpoints
-//{
-//    [Route("Services/PoolBox/Translations/[action]")]
-//    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
-//    public class TranslationsController : ServiceEndpoint
-//    {
-//        [HttpPost, AuthorizeCreate(typeof(MyRow))]
-//        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
-//        {
-//            return new MyRepository(Context).Create(uow, request);
-//        }
+namespace PoolBox.PoolBox.Endpoints
+{
+    [Route("Services/PoolBox/Flashcards/[action]")]
+    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
+    public class FlashcardsController : ServiceEndpoint
+    {
+        [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+        // SM-2 algorithm
+        public SaveResponse ProccessResponseQuality(IUnitOfWork uow, FlashcardsResponseQualityRequest request)
+        {
+            var row = request.Translation;
+            var quality = request.Quality;
 
-//        [HttpPost, AuthorizeUpdate(typeof(MyRow))]
-//        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
-//        {
-//            return new MyRepository(Context).Update(uow, request);
-//        }
- 
-//        [HttpPost, AuthorizeDelete(typeof(MyRow))]
-//        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
-//        {
-//            return new MyRepository(Context).Delete(uow, request);
-//        }
+            if (quality == ResponseQuality.Bad)
+            {
+                row.Repetition = 0;
+                row.IsRepeated = true;
+            }
+            else 
+            {
+                row.Repetition++;
+                row.Interval = CalculateRepetitionInterval(row.Repetition, (int)row.Interval, (float)row.EasinessFactor);
+                row.EasinessFactor = CalculateEasinessFactor(row.EasinessFactor, (int)quality);
+            }
 
-//        [HttpPost]
-//        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
-//        {
-//            return new MyRepository(Context).Retrieve(connection, request);
-//        }
+            return new MyRepository(Context).Update(uow, new SaveRequest<MyRow> { Entity = row, EntityId = row.TrId});
+        }
 
-//        [HttpPost]
-//        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
-//        {
-//            return new MyRepository(Context).List(connection, request);
-//        }
-//    }
-//}
+        private float CalculateEasinessFactor(float? previousEFactor, int respQuality)
+        {
+            var easinessFactor = (float)(previousEFactor + (0.1 - (5 - respQuality) * (0.08 + (5 - respQuality) * 0.02)));
+
+            return easinessFactor < 1.3 ? 1.3F : easinessFactor;
+        }
+
+        private int CalculateRepetitionInterval(int? repetition, int previousInterval, float easinessFactor)
+        {
+            if (repetition < 1)
+                throw new ArgumentOutOfRangeException("Repetition cannot be lower than 1.");
+
+            if (repetition == 1)
+                return 1;
+            if (repetition == 2)
+                return 6;
+
+            var interval = (int) Math.Round(previousInterval * easinessFactor, 2, MidpointRounding.AwayFromZero);
+            
+            return interval;
+        }
+
+    }
+}
