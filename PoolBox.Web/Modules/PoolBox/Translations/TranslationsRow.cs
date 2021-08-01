@@ -64,7 +64,7 @@ namespace PoolBox.PoolBox.Entities
             set => fields.UserId[this] = value;
         }
 
-        [DisplayName("Username"), Expression("jUser.Username")]
+        [DisplayName("Username"), Expression("jUser.Username"), MinSelectLevel(SelectLevel.List)]
         public String Username
         {
             get => fields.Username[this];
@@ -92,6 +92,20 @@ namespace PoolBox.PoolBox.Entities
             set => fields.Repetition[this] = value;
         }
 
+        [DisplayName("Interval"), Column("INTERVAL"), NotNull]
+        public Int32? Interval
+        {
+            get => fields.Interval[this];
+            set => fields.Interval[this] = value;
+        }
+
+        [NotMapped, DefaultValue(false), MinSelectLevel(SelectLevel.List)]
+        public Boolean? IsRepeated
+        {
+            get => fields.IsRepeated[this];
+            set => fields.IsRepeated[this] = value;
+        }
+
         public TranslationsRow()
             : base()
         {
@@ -115,6 +129,8 @@ namespace PoolBox.PoolBox.Entities
             public DateTimeField DueDate;
             public SingleField EasinessFactor;
             public Int32Field Repetition;
+            public Int32Field Interval;
+            public BooleanField IsRepeated;
         }
     }
 }

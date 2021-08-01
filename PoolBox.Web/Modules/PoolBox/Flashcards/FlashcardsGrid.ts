@@ -57,8 +57,11 @@ namespace PoolBox.PoolBox {
                     [[TranslationsRow.Fields.Username], '=', Authorization.userDefinition.Username],
                     [[TranslationsRow.Fields.PairId], '=', this.languagePairId],
                     [[TranslationsRow.Fields.DueDate], '<=', new Date()]
-                )
+                ),
+                Sort: [TranslationsRow.Fields.DueDate + ' DESC'],
+                IncludeColumns: ['IsGuessed']
             }
+
             TranslationsService.List(
                 req,
                 (response) => this.cardDeck = response.Entities
@@ -75,13 +78,13 @@ namespace PoolBox.PoolBox {
                 // DO STUFF
             })
 
-            // -- MEDIUM option
-            this.elements.mediumOptionBtn.addEventListener('click', () => {
+            // -- GOOD option
+            this.elements.goodOptionBtn.addEventListener('click', () => {
                 // DO STUFF
             })
 
-            // -- GOOD option
-            this.elements.goodOptionBtn.addEventListener('click', () => {
+            // -- EASY option
+            this.elements.easyOptionBtn.addEventListener('click', () => {
                 // DO STUFF
             })
         }
@@ -117,8 +120,8 @@ namespace PoolBox.PoolBox {
         public recalBtns = document.querySelector('#recall-btns-container') as HTMLElement;
         public showTranslationBtn = document.querySelector('#show-translation-btn') as HTMLElement;
         public badOptionBtn = document.querySelector('#bad-btn') as HTMLElement;
-        public mediumOptionBtn = document.querySelector('#medium-btn') as HTMLElement;
         public goodOptionBtn = document.querySelector('#good-btn') as HTMLElement;
+        public easyOptionBtn = document.querySelector('#easy-btn') as HTMLElement;
         public deckSizeSelectionPage: DeckSizeSelectionComponent;
     }
 }
