@@ -7,6 +7,7 @@ using MyRepository = PoolBox.PoolBox.Repositories.TranslationsRepository;
 using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
 using System;
 using PoolBox.Requests;
+using PoolBox.Responses;
 
 namespace PoolBox.PoolBox.Endpoints
 {
@@ -16,7 +17,7 @@ namespace PoolBox.PoolBox.Endpoints
     {
         [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         // SM-2 algorithm
-        public SaveResponse ProccessResponseQuality(IUnitOfWork uow, FlashcardsResponseQualityRequest request)
+        public FlashcardsResponseQualityResponse ProcessResponseQuality(IUnitOfWork uow, FlashcardsResponseQualityRequest request)
         {
             var row = request.Translation;
             var quality = request.Quality;
@@ -26,14 +27,16 @@ namespace PoolBox.PoolBox.Endpoints
                 row.Repetition = 0;
                 row.IsRepeated = true;
             }
-            else 
+            else
             {
                 row.Repetition++;
                 row.Interval = CalculateRepetitionInterval(row.Repetition, (int)row.Interval, (float)row.EasinessFactor);
                 row.EasinessFactor = CalculateEasinessFactor(row.EasinessFactor, (int)quality);
+                row.DueDate = row.DueDate.Value.AddDays((float)row.Interval);
             }
+            var error = new MyRepository(Context).Update(uow, new SaveRequest<MyRow> { Entity = row, EntityId = row.TrId }).Error;
 
-            return new MyRepository(Context).Update(uow, new SaveRequest<MyRow> { Entity = row, EntityId = row.TrId});
+            return new FlashcardsResponseQualityResponse { Row = row, Error = error };
         }
 
         private float CalculateEasinessFactor(float? previousEFactor, int respQuality)

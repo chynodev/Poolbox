@@ -1,21 +1,15 @@
 ﻿
 namespace PoolBox.PoolBox {
-
     @Serenity.Decorators.registerClass()
-    export class FlashcardsGrid extends Serenity.EntityGrid<TranslationsRow, any> {
-        //protected getColumnsKey() { return 'PoolBox.Flashcards'; }
-        //protected getDialogType() { return TranslationsDialog; }
-        //protected getIdProperty() { return TranslationsRow.idProperty; }
-        //protected getInsertPermission() { return TranslationsRow.insertPermission; }
-        //protected getLocalTextPrefix() { return TranslationsRow.localTextPrefix; }
-        //protected getService() { return TranslationsService.baseUrl; }
-
+    export class FlashcardsGrid extends Common.GridEditorBase<TranslationsRow> {
         protected elements: PageElements;
         protected selectedDeckSize: number;
         protected selectedFlashcardDirection: FlashcardDirection;
         protected wordInfoPanel: WordInfoPanel;
         protected cardDeck: TranslationsRow[];
+        protected reviewedCards: TranslationsRow[] = [];
         protected languagePairId: number;
+        protected activeCard: TranslationsRow;
 
         constructor(container: JQuery) {
             super(container);
@@ -50,21 +44,107 @@ namespace PoolBox.PoolBox {
             );
         }
 
+        protected processResponseQuality(quality: Requests.ResponseQuality) {
+            var req: Requests.FlashcardsResponseQualityRequest = {
+                Quality: quality,
+                Translation: this.activeCard
+            };
+            
+            FlashcardsService.ProcessResponseQuality(
+                req,
+                (response) => HelperMethods.mapObject(response.Row, this.activeCard),
+                { async: false }
+            );
+        }
+
+        protected nextCard(quality: Requests.ResponseQuality) {
+            this.processResponseQuality(quality);
+
+            let idx = this.cardDeck.indexOf(this.activeCard);
+            let previousCard = this.activeCard;
+
+            if (idx == this.cardDeck.length - 1)
+                this.displayCard(this.cardDeck[0])
+            else 
+                this.displayCard(this.cardDeck[idx + 1]);
+
+            if (quality != Requests.ResponseQuality.Bad) {
+                this.reviewedCards.push(previousCard);
+                this.cardDeck.splice(idx, 1);
+            }
+
+            this.hideTranslation();
+
+            if (this.cardDeck.length == 0) 
+                this.displayReviewedCards();
+        }
+
+        protected displayReviewedCards() {
+            this.removeFlashCardsComponents();
+
+            this.elements.flashcardsContainer.style.display = 'flex';
+            this.elements.flashcardsContainer.style.justifyContent = 'center';
+
+            this.reviewedCards.forEach(card => {
+                this.addReviewedWordToTableElement(card);
+            });
+
+            this.elements.flashcardsContainer.append(this.elements.reviewedCardListContainer);
+            this.elements.reviewedCardListContainer.style.display = 'block';
+        }
+
+        protected addReviewedWordToTableElement(card: TranslationsRow) {
+            let ogReviewedWordRow = this.elements.reviewedCardList.querySelector('.reviewed-word-row');
+
+            let newReviewedWordRow = ogReviewedWordRow.cloneNode(true);
+            (<HTMLElement>newReviewedWordRow).querySelector('.reviewed-word').innerHTML = card.Translated;
+            (<HTMLElement>newReviewedWordRow).querySelector('.due-in').innerHTML = card.Interval + ' day' + (card.Interval > 1 ? 's' : '');
+            this.elements.reviewedCardList.append(newReviewedWordRow);
+        }
+
+        protected removeFlashCardsComponents() {
+            while (this.elements.flashcardsContainer.childNodes.length != 0) {
+                this.elements.flashcardsContainer.childNodes[0].remove();
+            }
+        }
+
+        protected displayCard(card: TranslationsRow) {
+            this.activeCard = card;
+            this.elements.originalWord.innerHTML = card.Original;
+            this.elements.translatedWord.innerHTML = card.Translated;
+        }
+
+        protected areAllRepeated() {
+            return this.cardDeck.every(x => x.IsRepeated == true);
+        }
+
         protected fetchCardDeck() {
+            let date = new Date();
+            // GMT + 2 midnight 
+            date.setHours(26, 0, 0, 0);
+
             var req: Serenity.ListRequest = {
                 Take: this.selectedDeckSize,
                 Criteria: Serenity.Criteria.and(
                     [[TranslationsRow.Fields.Username], '=', Authorization.userDefinition.Username],
                     [[TranslationsRow.Fields.PairId], '=', this.languagePairId],
-                    [[TranslationsRow.Fields.DueDate], '<=', new Date()]
+                    [[TranslationsRow.Fields.DueDate], '<=', date]
                 ),
-                Sort: [TranslationsRow.Fields.DueDate + ' DESC'],
-                IncludeColumns: ['IsGuessed']
+                Sort: [TranslationsRow.Fields.DueDate + ' DESC']
             }
 
             TranslationsService.List(
                 req,
-                (response) => this.cardDeck = response.Entities
+                (response) => {
+                    this.cardDeck = response.Entities
+
+                    if (this.isDeckEmpty())
+                        this.elements.originalWord.innerHTML = "You don't have any cards scheduled for today";
+                    else {
+                        let middleCard = this.cardDeck[parseInt((this.cardDeck.length / 2).toString())]
+                        this.displayCard(middleCard);
+                    }
+                }
             );
         }
 
@@ -75,18 +155,36 @@ namespace PoolBox.PoolBox {
 
             // -- BAD option
             this.elements.badOptionBtn.addEventListener('click', () => {
-                // DO STUFF
+                this.nextCard(Requests.ResponseQuality.Bad);
             })
 
             // -- GOOD option
             this.elements.goodOptionBtn.addEventListener('click', () => {
-                // DO STUFF
+                this.nextCard(Requests.ResponseQuality.Good);
             })
 
             // -- EASY option
             this.elements.easyOptionBtn.addEventListener('click', () => {
-                // DO STUFF
+                this.nextCard(Requests.ResponseQuality.Easy);
             })
+        }
+
+        protected showTranslation() {
+            this.elements.recalBtns.style.visibility = 'visible';
+            this.elements.translatedWord.style.visibility = 'visible';
+            this.elements.showTranslationBtn.style.visibility = 'hidden';
+            this.wordInfoPanel.renderTranslation(this.activeCard);
+        }
+
+        protected hideTranslation() {
+            this.elements.recalBtns.style.visibility = 'hidden';
+            this.elements.translatedWord.style.visibility = 'hidden';
+            this.elements.showTranslationBtn.style.visibility = 'visible';
+            this.wordInfoPanel.clearPanel();
+        }
+
+        protected isDeckEmpty() {
+            return this.cardDeck.length == 0;
         }
 
         // --override
@@ -104,19 +202,18 @@ namespace PoolBox.PoolBox {
             return false;
         }
 
-        protected showTranslation() {
-            this.elements.recalBtns.style.visibility = 'visible';
-            this.elements.translatedWord.style.visibility = 'visible';
-            this.elements.showTranslationBtn.style.visibility = 'hidden';
-        }
     }
 
     class PageElements {
         public wordPanel = document.querySelector('#word-info-panel') as HTMLElement;
         public flashcardsAndPanel = document.querySelector('#flashcards-panel-container') as HTMLElement;
+        public flashcardsContainer = document.querySelector('#flashcards-wrapper') as HTMLElement;
+        public reviewedCardList = document.querySelector('#reviewed-cards-list') as HTMLElement;
+        public reviewedCardListContainer = document.querySelector('#reviewed-cards-list-container') as HTMLElement;
         public wordName = document.querySelector('#word-name') as HTMLElement;
         public grid = document.querySelector('.grid-container') as HTMLElement;
         public translatedWord = document.querySelector('#translated-word-wrapper') as HTMLElement;
+        public originalWord = document.querySelector('#original-word-wrapper') as HTMLElement;
         public recalBtns = document.querySelector('#recall-btns-container') as HTMLElement;
         public showTranslationBtn = document.querySelector('#show-translation-btn') as HTMLElement;
         public badOptionBtn = document.querySelector('#bad-btn') as HTMLElement;
@@ -124,4 +221,5 @@ namespace PoolBox.PoolBox {
         public easyOptionBtn = document.querySelector('#easy-btn') as HTMLElement;
         public deckSizeSelectionPage: DeckSizeSelectionComponent;
     }
+
 }

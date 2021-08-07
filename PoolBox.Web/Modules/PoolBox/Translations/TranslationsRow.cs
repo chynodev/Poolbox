@@ -71,28 +71,28 @@ namespace PoolBox.PoolBox.Entities
             set => fields.Username[this] = value;
         }
 
-        [DisplayName("Due date"), Column("DUE_DATE"), NotNull]
+        [DisplayName("Due date"), Column("DUE_DATE")]
         public DateTime? DueDate
         {
             get => fields.DueDate[this];
             set => fields.DueDate[this] = value;
         }
 
-        [DisplayName("Easiness Factor"), Column("EASINESS_FACTOR"), NotNull]
+        [DisplayName("Easiness Factor"), Column("EASINESS_FACTOR")]
         public Single? EasinessFactor
         {
             get => fields.EasinessFactor[this];
             set => fields.EasinessFactor[this] = value;
         }
 
-        [DisplayName("Repetition"), Column("REPETITION"), NotNull]
+        [DisplayName("Repetition"), Column("REPETITION")]
         public Int32? Repetition
         {
             get => fields.Repetition[this];
             set => fields.Repetition[this] = value;
         }
 
-        [DisplayName("Interval"), Column("INTERVAL"), NotNull]
+        [DisplayName("Interval"), Column("INTERVAL")]
         public Int32? Interval
         {
             get => fields.Interval[this];

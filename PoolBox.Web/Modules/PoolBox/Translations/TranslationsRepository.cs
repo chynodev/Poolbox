@@ -52,6 +52,19 @@ namespace PoolBox.PoolBox.Repositories
                 : base(context)
             {
             }
+
+            protected override void BeforeSave()
+            {
+                base.BeforeSave();
+
+                var languagePairId = new UserPreferenceRepository(Context)
+                    .Retrieve(
+                        Connection,
+                        new UserPreferenceRetrieveRequest { PreferenceType = "LanguagePairPreference", Name = "Language pair ID" }
+                    ).Value;
+
+                Row.PairId = Int32.Parse(languagePairId);
+            }
         }
         
         private class MyDeleteHandler : DeleteRequestHandler<MyRow> 

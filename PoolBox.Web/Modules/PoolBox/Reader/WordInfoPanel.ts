@@ -5,6 +5,8 @@
     @Serenity.Decorators.responsive()
     export class WordInfoPanel extends Serenity.TemplatedPanel<any> {
 
+        protected elements: PageElements;
+
         constructor(container: JQuery, options: WordInfoOptions) {
             super(container);
             this.element.addClass('flex-layout');
@@ -13,7 +15,19 @@
 
             if (options.hideToolbar)
                 this.toolbar.element.remove();
-            this.setTitle(options.title ??'');
+            this.setTitle(options.title ?? '');
+
+            this.elements = new PageElements();
+        }
+
+        public renderTranslation(translation: TranslationsRow) {
+            this.elements.nounGender.innerHTML = translation.NounGender ?? '';
+            this.elements.wordType.innerHTML = translation.WordType ?? '';
+        }
+
+        public clearPanel() {
+            this.elements.nounGender.innerHTML = '';
+            this.elements.wordType.innerHTML = '';
         }
 
         protected getToolbarButtons(): Serenity.ToolButton[] {
@@ -33,6 +47,11 @@
         public setTitle(title: string) {
             this.element[0].querySelector('#word-name').innerHTML = title;
         }
+    }
+
+    class PageElements {
+        public wordType = document.querySelector('#word-type') as HTMLElement;
+        public nounGender = document.querySelector('#noun-gender') as HTMLElement;
     }
 
     interface WordInfoOptions {
