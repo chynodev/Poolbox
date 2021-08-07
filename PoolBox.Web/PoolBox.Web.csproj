@@ -15,6 +15,7 @@
     <EmbeddedResource Include="Migrations\**\*.sql" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
     <None Remove="Modules\Common\Helpers\ExtensionMethods.ts" />
     <None Remove="Modules\Common\Helpers\FileImportDialog.ts" />
+    <None Remove="Modules\Common\Helpers\HelperMethods.ts" />
     <None Remove="Modules\Common\Helpers\TextFormatter.ts" />
     <None Remove="Modules\Common\UserPreference\LanguagePairPreference.ts" />
     <None Remove="Modules\PoolBox\DictionaryServices\DictionaryParserAbstraction.ts" />

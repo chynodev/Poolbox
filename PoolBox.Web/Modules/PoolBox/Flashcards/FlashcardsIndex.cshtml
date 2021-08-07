@@ -59,8 +59,6 @@
         line-height: 46px;
     }
 
-
-
     #medium-btn {
         margin: 0 15px;
     }
@@ -69,6 +67,52 @@
         visibility: hidden;
     }
 
+    #reviewed-cards-list-container {
+        display: none;
+        flex-basis: 40%;
+        height: fit-content;
+    }
+
+    #reviewed-cards-list {
+        width: 100%;
+        border: 1px solid dimgray;
+        border: 2px solid #3c8dbc;
+        box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+    }
+
+    #reviewed-cards-list > caption{
+        text-align: center;
+        border: none;
+        background-color: white;
+        font-weight: 600;
+        font-size: 24px;
+        color: #474747;
+
+    }
+
+    th {
+        background-color: #3c8dbc;
+        color: white;
+        padding: 7px 0;
+    }
+
+    td {
+        padding: 2px 0;
+    }
+
+    th, td {
+        font-size: 17px;
+        /*width: 60px;*/
+        text-align: center;
+    }
+
+    .cell-space{
+        width: 100px;
+    }
+
+
+    /*///////////     Simple TABLE     /////////*/
+
 </style>
 
 <div id="GridDiv" style="background-color: #ecf0f5;">
@@ -76,9 +120,9 @@
 </div>
 
 <div id="flashcards-panel-container" class="row">
-    <div id="flashcards-wrapper" class="col-md-9" >
+    <div id="flashcards-wrapper" class="col-md-9">
         <div id="top-flashcard">
-            <div class="word-wrapper">Some Word</div>
+            <div id="original-word-wrapper" class="word-wrapper">Some Word</div>
         </div>
         <hr />
         <div id="bottom-flashcard">
@@ -90,17 +134,33 @@
                 <button id="easy-btn" class="okta-btn-design">Easy</button>
             </div>
         </div>
-    </div >
 
-    <div id="word-info-panel" class="col-md-3"> </div >
+    </div>
+
+    <div id="reviewed-cards-list-container">
+        <table id="reviewed-cards-list">
+            <caption>Reviewed cards</caption>
+            <tr>
+                <th>Word</th>
+                <th>Due in</th>
+            </tr>
+            <tr class="reviewed-word-row">
+                <td class="reviewed-word"></td>
+                <td class="due-in"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="word-info-panel" class="col-md-3"> </div>
+
 </div>
 
-<div id="DeckSizeSelection"> </div >
+<div id="DeckSizeSelection"> </div>
 
-<script type="text/javascript" >
-jQuery(function () {
-    new PoolBox.PoolBox.FlashcardsGrid($('#GridDiv'), {}).init();
+<script type="text/javascript">
+    jQuery(function () {
+        new PoolBox.PoolBox.FlashcardsGrid($('#GridDiv'), {}).init();
 
-    Q.initFullHeightGridPage($('#GridDiv'));
-});
-</script >
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

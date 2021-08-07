@@ -17,5 +17,6 @@ namespace PoolBox.PoolBox.Columns
         [EditLink]
         public String Original { get; set; }
         public String Translated { get; set; }
+        public Int64 PairId { get; set; }
     }
 }

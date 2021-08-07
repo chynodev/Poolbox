@@ -14,6 +14,8 @@ namespace PoolBox.PoolBox.Forms
     {
         public String Original { get; set; }
         public String Translated { get; set; }
+        public String WordType { get; set; }
+        [Hidden]
         public Int64 PairId { get; set; }
     }
 }
