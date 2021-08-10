@@ -1,24 +1,34 @@
-﻿<div class="box box-primary">
+﻿<style>
+    .form-field-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-field-container > div.vx{
+        display: none;
+    }
+
+    .form-field-container > label.caption {
+        text-align: left;
+        color: black;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .form-field-container > input.editor {
+        padding: 3px;
+        font-size: 14px;
+    }
+
+</style>
+
+<div class="box box-primary">
     <div class="box-header with-border">
         <h1 id="word-name" class="box-title"></h1>
         <div class="box-tools pull-right">
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-        </div><!-- /.box-tools -->
-    </div><!-- /.box-header -->
-    <!--<div>
-        <button>Save</button>
-        <button>Delete</button>-->
-    <!--</div>-->
-
-<div class="box-body box-profile">
-    <div id="~_Toolbar" class="s-DialogToolbar" style="border-bottom: 1px solid #f4f4f4;"></div>
-
-    <h4>Type</h4>
-    <div id="word-type" style="height: 50%;"></div>
-    <h4>Gender</h4>
-    <div id="noun-gender" style="height: 50%;"></div>
-    <h4>Examples</h4>
-    <div id="translations" style="height: 50%;"></div>
-</div>
-
+        </div>
+    </div>
+    
+    <div id="form-container" class="box-body box-profile"></div>
 </div>
