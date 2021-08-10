@@ -40,7 +40,12 @@ namespace PoolBox.PoolBox {
         protected initWordInfoPanel() {
             this.wordInfoPanel = new WordInfoPanel(
                 $('#word-info-panel'),
-                { hideToolbar: false, title: 'Edit translation' }
+                {
+                    hideToolbar: false,
+                    title: 'Edit translation',
+                    onDeleteGridAction: this.nextCard.bind(this),
+                    onSaveGridAction: this.updateCardOriginalAndTranslation.bind(this)
+                }
             );
         }
 
@@ -57,8 +62,9 @@ namespace PoolBox.PoolBox {
             );
         }
 
-        protected nextCard(quality: Requests.ResponseQuality) {
-            this.processResponseQuality(quality);
+        protected nextCard(quality: Requests.ResponseQuality = null) {
+            if(quality)
+                this.processResponseQuality(quality);
 
             let idx = this.cardDeck.indexOf(this.activeCard);
             let previousCard = this.activeCard;
@@ -69,10 +75,10 @@ namespace PoolBox.PoolBox {
                 this.displayCard(this.cardDeck[idx + 1]);
 
             if (quality != Requests.ResponseQuality.Bad) {
-                this.reviewedCards.push(previousCard);
+                if(quality)
+                    this.reviewedCards.push(previousCard);
                 this.cardDeck.splice(idx, 1);
             }
-
             this.hideTranslation();
 
             if (this.cardDeck.length == 0) 
@@ -81,7 +87,7 @@ namespace PoolBox.PoolBox {
 
         protected displayReviewedCards() {
             this.removeFlashCardsComponents();
-
+            
             this.elements.flashcardsContainer.style.display = 'flex';
             this.elements.flashcardsContainer.style.justifyContent = 'center';
 
@@ -97,7 +103,7 @@ namespace PoolBox.PoolBox {
             let ogReviewedWordRow = this.elements.reviewedCardList.querySelector('.reviewed-word-row');
 
             let newReviewedWordRow = ogReviewedWordRow.cloneNode(true);
-            (<HTMLElement>newReviewedWordRow).querySelector('.reviewed-word').innerHTML = card.Translated;
+            (<HTMLElement>newReviewedWordRow).querySelector('.reviewed-word').innerHTML = card.Original;
             (<HTMLElement>newReviewedWordRow).querySelector('.due-in').innerHTML = card.Interval + ' day' + (card.Interval > 1 ? 's' : '');
             this.elements.reviewedCardList.append(newReviewedWordRow);
         }
@@ -185,6 +191,11 @@ namespace PoolBox.PoolBox {
 
         protected isDeckEmpty() {
             return this.cardDeck.length == 0;
+        }
+
+        protected updateCardOriginalAndTranslation(updatedCard: TranslationsRow) {
+            HelperMethods.mapObject(updatedCard, this.activeCard);
+            this.displayCard(this.activeCard);
         }
 
         // --override

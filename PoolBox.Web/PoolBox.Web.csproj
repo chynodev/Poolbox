@@ -27,6 +27,7 @@
     <None Remove="Modules\PoolBox\Flashcards\TranslationsDialog.ts" />
     <None Remove="Modules\PoolBox\Reader\WordInfoPanel.ts" />
     <TypeScriptCompile Remove="Modules\PoolBox\Flashcards\DeckAndDirectionSelectionComponent.ts" />
+    <TypeScriptCompile Remove="Modules\PoolBox\Translations\TranslationsPanelDialog.ts" />
     <None Update="wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
