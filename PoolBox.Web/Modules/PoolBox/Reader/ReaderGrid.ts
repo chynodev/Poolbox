@@ -24,12 +24,24 @@ namespace PoolBox.PoolBox {
 
             this.setTitle('Reader');
             this.slickGrid.destroy();
-            this.wordInfoPanel = new WordInfoPanel($('#word-info-panel'), { hideToolbar: true, title: '' });
+            this.initWordInfoPanel();
             this.elements = new ReaderElements();
             this.elements.grid.setAttribute('id', 'reader-grid');   
             this.addPasteFromClipboardEventListener();
             this.setReaderMouseActions();
             this.insertReaderBeforeWordPanel();
+        }
+        
+        protected initWordInfoPanel() {
+            this.wordInfoPanel = new WordInfoPanel(
+                $('#word-info-panel'),
+                {
+                    hideToolbar: true,
+                    title: 'Edit Translation',
+                    onDeleteGridAction: null,
+                    onSaveGridAction: null
+                }
+            );
         }
 
         protected addPasteFromClipboardEventListener() {

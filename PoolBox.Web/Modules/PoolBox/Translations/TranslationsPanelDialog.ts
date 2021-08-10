@@ -56,7 +56,8 @@ namespace PoolBox.PoolBox {
             options: Serenity.ServiceOptions<Serenity.SaveResponse>,
             callback: (response: Serenity.SaveResponse) => void)
         {
-            this.onSaveGridAction(options.request.Entity);
+            if (this.onSaveGridAction)
+                this.onSaveGridAction(options.request.Entity);
 
             super.saveHandler(options, callback);
         }
