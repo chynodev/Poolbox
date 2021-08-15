@@ -57,7 +57,7 @@ namespace PoolBox.PoolBox {
             
             FlashcardsService.ProcessResponseQuality(
                 req,
-                (response) => HelperMethods.mapObject(response.Row, this.activeCard),
+                (response) => My.mapObject(response.Row, this.activeCard),
                 { async: false }
             );
         }
@@ -194,7 +194,7 @@ namespace PoolBox.PoolBox {
         }
 
         protected updateCardOriginalAndTranslation(updatedCard: TranslationsRow) {
-            HelperMethods.mapObject(updatedCard, this.activeCard);
+            My.mapObject(updatedCard, this.activeCard);
             this.displayCard(this.activeCard);
         }
 

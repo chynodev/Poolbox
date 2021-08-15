@@ -10,13 +10,81 @@ namespace PoolBox.PoolBox {
         protected getLocalTextPrefix() { return TranslationsRow.localTextPrefix; }
         protected getService() { return TranslationsService.baseUrl; }
 
+        protected clipboardText: string;
+        protected pastedRows: TranslationsRow[];
+        protected elements: PageElements;
+        protected isImportMode: boolean = false;
+
         constructor(container: JQuery) {
             super(container);
 
             let currentLng = new Common.LanguagePairPreference().getItem();
+            this.addPasteFromClipboardEventListener();
         }
 
+        protected addPasteFromClipboardEventListener() {
+            let _this = this;
+            window.addEventListener("paste", e => {
+                this.clipboardText = (<ClipboardEvent>e).clipboardData.getData('Text');
 
+                TranslationsService.FormatClipboardText({
+                    ClipboardText: _this.clipboardText
+                },
+                    (response) => {
+                        this.pastedRows = response.Entities;
+                        this.pasteRowsOntoGrid(this.pastedRows);
+                    }
+                );
+
+            }, false)
+        }
+
+        protected activateImportMode() {
+            this.isImportMode = true;
+            My.hideHtmlElement(this.elements.saveButton);
+            My.disableHtmlElement(this.elements.searchBar);
+            My.disableHtmlElement(this.elements.columnsBar);
+            My.hideHtmlElement(this.elements.addButton);
+            My.showHtmlElement(this.elements.importButton);
+        }
+
+        protected deactivateImportMode() {
+            this.isImportMode = false;
+            My.showHtmlElement(this.elements.saveButton);
+            My.enableHtmlElement(this.elements.searchBar);
+            My.enableHtmlElement(this.elements.columnsBar);
+            My.showHtmlElement(this.elements.addButton);
+            My.hideHtmlElement(this.elements.importButton);
+        }
+
+        protected pasteRowsOntoGrid(rows: TranslationsRow[]) {
+            this.assignTemporaryIdToPastedRows(rows);
+            this.view.setItems(rows);
+            this.activateImportMode();
+        }
+
+        protected assignTemporaryIdToPastedRows(rows: TranslationsRow[]) {
+            rows.forEach((row, idx) => {
+                row.TrId = (-1) * (idx + 1)
+            })
+        }
+
+        protected getButtons(): Serenity.ToolButton[] {
+            let buttons = super.getButtons().filter(x => x.cssClass != 'column-picker-button');
+
+            buttons.push({
+                title: 'Import',
+                cssClass: 'apply-changes-button',
+                visible: false,
+                onClick: (e) => {
+                    //this.saveButtonOnClick(e, _this)
+                }
+            });
+            
+            return buttons;
+        }
+
+        // -- override
         protected getColumns() {
             var columns = super.getColumns();
 
@@ -33,6 +101,7 @@ namespace PoolBox.PoolBox {
             return columns;
         }
 
+        // -- override
         protected onClick(e: JQueryEventObject, row: number, cell: number) {
             super.onClick(e, row, cell);
 
@@ -48,7 +117,7 @@ namespace PoolBox.PoolBox {
 
             if (target.hasClass('inline-action')) {
                 e.preventDefault();
-
+                
                 if (target.hasClass('delete-row')) {
                     TranslationsService.Delete(
                         { EntityId: item.TrId },
@@ -57,5 +126,22 @@ namespace PoolBox.PoolBox {
                 }
             }
         }
+
+        // -- override
+        protected createToolbarExtensions() {
+            super.createToolbarExtensions();
+            this.elements = new PageElements();
+        }
+
+    }
+
+    class PageElements {
+        public refreshButton = document.querySelector('.refresh-button') as HTMLElement;
+        public saveButton = document.querySelector('.apply-changes-button') as HTMLElement;
+        public searchBar = document.querySelector('.s-QuickSearchInput') as HTMLInputElement;
+        public filtersBar = document.querySelector('.quick-filters-bar.s-QuickFilterBar') as HTMLElement;
+        public columnsBar = document.querySelector('.slick-pane.slick-pane-header') as HTMLElement;
+        public addButton = document.querySelector('.add-button') as HTMLElement;
+        public importButton = document.querySelector('.apply-changes-button') as HTMLElement;
     }
 }
