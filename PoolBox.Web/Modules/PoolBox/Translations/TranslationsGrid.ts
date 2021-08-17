@@ -27,7 +27,7 @@ namespace PoolBox.PoolBox {
             window.addEventListener("paste", e => {
                 this.clipboardText = (<ClipboardEvent>e).clipboardData.getData('Text');
 
-                TranslationsService.FormatClipboardText({
+                TranslationsService.CSVClipboardFormatAndCheck({
                     ClipboardText: _this.clipboardText
                 },
                     (response) => {
@@ -79,6 +79,23 @@ namespace PoolBox.PoolBox {
                 onClick: (e) => {
                     //this.saveButtonOnClick(e, _this)
                 }
+            });
+            buttons.push({
+                title: 'Upload file',
+                cssClass: 'export-csv-button',
+                onClick: () => {
+                    var dialog = new TranslationsFileImportDialog(
+                        TranslationsService.CSVFileFormatAndCheck,
+                        this.pasteRowsOntoGrid.bind(this)
+                    );
+                    dialog.element.on('dialogclose',
+                        () => {
+                            this.refresh();
+                            dialog = null;
+                        });
+                    dialog.dialogOpen();
+                },
+                separator: true
             });
             
             return buttons;
@@ -143,5 +160,6 @@ namespace PoolBox.PoolBox {
         public columnsBar = document.querySelector('.slick-pane.slick-pane-header') as HTMLElement;
         public addButton = document.querySelector('.add-button') as HTMLElement;
         public importButton = document.querySelector('.apply-changes-button') as HTMLElement;
+        public uploadCsvFileButton = document.querySelector('.export-csv-button') as HTMLElement;
     }
 }
