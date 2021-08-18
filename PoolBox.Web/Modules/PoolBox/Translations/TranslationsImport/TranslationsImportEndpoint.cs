@@ -16,6 +16,24 @@ namespace PoolBox.PoolBox.Endpoints
 {
     public partial class TranslationsController : ServiceEndpoint
     {
+        [HttpPost, AuthorizeCreate(typeof(MyRow))]
+        public RetrieveResponse<MyRow> Import(IUnitOfWork uow, SaveRequest<MyRow> request)
+        {
+            var response = new RetrieveResponse<MyRow> { Entity = request.Entity} ;
+
+            try
+            {
+                request.Entity.TrId = null;
+                new MyRepository(Context).Create(uow, request);
+            }
+            catch(Exception ex)
+            {
+                response.Entity.Error = ex.Message;
+            }
+            
+            return response;
+        }
+
         protected ListResponse<MyRow> CSVClipboardFormatAndCheck(ClipboardFormatRequest request)
         {
             var rdr = new ChoETL.ChoCSVReader(

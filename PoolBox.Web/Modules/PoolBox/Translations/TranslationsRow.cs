@@ -106,6 +106,13 @@ namespace PoolBox.PoolBox.Entities
             set => fields.IsRepeated[this] = value;
         }
 
+        [NotMapped, DisplayName("Error")]
+        public String Error
+        {
+            get => fields.Error[this];
+            set => fields.Error[this] = value;
+        }
+
         public TranslationsRow()
             : base()
         {
@@ -131,6 +138,8 @@ namespace PoolBox.PoolBox.Entities
             public Int32Field Repetition;
             public Int32Field Interval;
             public BooleanField IsRepeated;
+         
+            public StringField Error;
         }
     }
 }
