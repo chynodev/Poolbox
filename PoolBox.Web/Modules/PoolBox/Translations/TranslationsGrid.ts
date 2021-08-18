@@ -14,6 +14,7 @@ namespace PoolBox.PoolBox {
         protected pastedRows: TranslationsRow[];
         protected elements: PageElements;
         protected isImportMode: boolean = false;
+        protected errorColumn: Slick.Column;
 
         constructor(container: JQuery) {
             super(container);
@@ -77,7 +78,7 @@ namespace PoolBox.PoolBox {
                 cssClass: 'apply-changes-button',
                 visible: false,
                 onClick: (e) => {
-                    //this.saveButtonOnClick(e, _this)
+                    this.importTranslations(this.view.getItems());
                 }
             });
             buttons.push({
@@ -101,6 +102,36 @@ namespace PoolBox.PoolBox {
             return buttons;
         }
 
+        protected importTranslations(rows: TranslationsRow[]) {
+            let errorRows = [];
+            rows.forEach(row => {
+                TranslationsService.Import(
+                    { Entity: row },
+                    (response) => {
+                        if (response.Entity.Error) {
+                            row.Error = response.Entity.Error;
+                            errorRows.push(row);
+                        }
+                    },
+                    { async: false }
+                )
+            });
+            Q.notifySuccess(
+                'Successfully imported ' +
+                (rows.length - errorRows.length == rows.length ? ' all' : (rows.length - errorRows.length) + ' out of ' + rows.length)
+                + ' rows.',
+                null,
+                { timeOut: 3000 }
+            );
+
+            if (errorRows) {
+                this.showErrorColumn();
+                this.view.setItems(errorRows);
+            } else {
+                this.refresh();
+            }
+        }
+
         // -- override
         protected getColumns() {
             var columns = super.getColumns();
@@ -115,7 +146,26 @@ namespace PoolBox.PoolBox {
                 maxWidth: 24
             });
 
+            this.errorColumn = Q.first(columns, x => x.field == 'Error');
+
             return columns;
+        }
+
+        protected showErrorColumn() {
+            var cols = this.slickGrid.getColumns();
+            cols.push(this.errorColumn);
+            this.slickGrid.setColumns(cols);
+        }
+
+        protected hideErrorColumn() {
+            var cols = this.slickGrid.getColumns().filter(x => x.name != 'Error');
+            this.slickGrid.setColumns(cols);
+        }
+
+        protected onViewProcessData(response: Serenity.ListResponse<PoolBox.TranslationsRow>) {
+            this.deactivateImportMode();
+
+            return super.onViewProcessData(response);
         }
 
         // -- override
@@ -136,6 +186,7 @@ namespace PoolBox.PoolBox {
                 e.preventDefault();
                 
                 if (target.hasClass('delete-row')) {
+                    // -- this.isImportMode
                     TranslationsService.Delete(
                         { EntityId: item.TrId },
                         () => { this.refresh(); }
@@ -162,4 +213,5 @@ namespace PoolBox.PoolBox {
         public importButton = document.querySelector('.apply-changes-button') as HTMLElement;
         public uploadCsvFileButton = document.querySelector('.export-csv-button') as HTMLElement;
     }
+
 }

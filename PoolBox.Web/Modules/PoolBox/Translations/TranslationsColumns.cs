@@ -14,6 +14,8 @@ namespace PoolBox.PoolBox.Columns
         public String Translated { get; set; }
         public String WordType { get; set; }
         public String NounGender { get; set; }
+        [Hidden]
+        public String Error { get; set; }
 
     }
 }
