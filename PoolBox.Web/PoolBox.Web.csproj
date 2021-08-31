@@ -26,6 +26,7 @@
     <None Remove="Modules\PoolBox\Reader\TextHighlighter.ts" />
     <None Remove="Modules\PoolBox\Flashcards\TranslationsDialog.ts" />
     <None Remove="Modules\PoolBox\Reader\WordInfoPanel.ts" />
+    <None Remove="Modules\PoolBox\Translations\TranslationsImport\TranslationsInMemoryDialog.ts" />
     <TypeScriptCompile Remove="Modules\PoolBox\Flashcards\DeckAndDirectionSelectionComponent.ts" />
     <TypeScriptCompile Remove="Modules\PoolBox\Translations\TranslationsFileImportDialog.ts" />
     <TypeScriptCompile Remove="Modules\PoolBox\Translations\TranslationsPanelDialog.ts" />
