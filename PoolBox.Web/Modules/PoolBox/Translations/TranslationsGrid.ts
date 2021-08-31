@@ -4,7 +4,7 @@ namespace PoolBox.PoolBox {
     @Serenity.Decorators.registerClass()
     export class TranslationsGrid extends Serenity.EntityGrid<TranslationsRow, any> {
         protected getColumnsKey() { return 'PoolBox.Translations'; }
-        protected getDialogType() { return TranslationsDialog; }
+        protected getDialogType() { return this.isImportMode ? TranslationsInMemoryDialog : TranslationsDialog }
         protected getIdProperty() { return TranslationsRow.idProperty; }
         protected getInsertPermission() { return TranslationsRow.insertPermission; }
         protected getLocalTextPrefix() { return TranslationsRow.localTextPrefix; }
@@ -87,6 +87,7 @@ namespace PoolBox.PoolBox {
             rows.forEach(row => row.TrId = --startId);
         }
 
+        // -- override
         protected getButtons(): Serenity.ToolButton[] {
             let buttons = super.getButtons().filter(x => x.cssClass != 'column-picker-button');
 
@@ -111,6 +112,56 @@ namespace PoolBox.PoolBox {
             });
             
             return buttons;
+        }
+
+        // -- override
+        protected editItem(entityOrId: any): void {
+
+            if (!this.isImportMode) {
+                super.editItem(entityOrId);
+                return;
+            }
+
+            var item = this.view.getItemById(entityOrId);
+            this.createEntityDialog(this.getItemType(), dlg => {
+                var dialog = dlg as Common.GridEditorDialog<TranslationsRow>;
+                dialog.onDelete = (opt, callback) => {
+                    this.deleteRow(item.TrId)
+                    dialog.dialogClose();
+                };
+                this.transferDialogReadOnly(dialog);
+                dialog.onSave = (opt, callback) => {
+                    item.Error = null;
+                    this.save(opt);
+                    dialog.dialogClose();
+                };
+                dialog.loadEntityAndOpenDialog(item);
+            });
+        }
+
+        protected save(opt: Serenity.ServiceOptions<any>) {
+            var request = opt.request as Serenity.SaveRequest<TranslationsRow>;
+            var row = request.Entity;
+
+            var items = this.view.getItems();
+            var index = Q.indexOf(items, x => x.TrId == row.TrId);
+
+            items[index] = Q.deepClone({} as TranslationsRow, items[index], row);
+            this.view.setItems([]);
+            this.assignTemporaryIdToPastedRows(items);
+            this.setItems(items);
+        }
+
+        protected deleteRow(entityOrId: number | TranslationsRow) {
+            let id = typeof (entityOrId) != 'number' ? (entityOrId as TranslationsRow).TrId : entityOrId;
+
+            if (this.isImportMode)
+                this.view.setItems(this.view.getItems().filter(x => x.TrId != id))
+            else
+                TranslationsService.Delete(
+                    { EntityId: id },
+                    () => { this.refresh(); }
+                );
         }
 
         protected importTranslations(rows: TranslationsRow[]) {
@@ -198,13 +249,7 @@ namespace PoolBox.PoolBox {
                 e.preventDefault();
                 
                 if (target.hasClass('delete-row')) {
-                    if (this.isImportMode)
-                        this.view.setItems(this.view.getItems().filter(x => x.TrId != item.TrId))
-                    else
-                        TranslationsService.Delete(
-                            { EntityId: item.TrId },
-                            () => { this.refresh(); }
-                        );
+                    this.deleteRow(item.TrId)
                 }
             }
         }

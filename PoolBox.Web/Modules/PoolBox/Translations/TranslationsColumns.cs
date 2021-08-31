@@ -11,8 +11,11 @@ namespace PoolBox.PoolBox.Columns
     {
         [EditLink]
         public String Original { get; set; }
+        [EditLink]
         public String Translated { get; set; }
+        [EditLink]
         public String WordType { get; set; }
+        [EditLink]
         public String NounGender { get; set; }
         [Hidden]
         public String Error { get; set; }

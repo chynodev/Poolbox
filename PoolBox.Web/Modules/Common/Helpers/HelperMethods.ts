@@ -3,8 +3,11 @@
     /**
      * Maps all identical fields of one object to another
      */
-    export function mapObject(source: any, destination: any) {
+    export function mapObject(source: any, destination: any, omitNulls = false) {
         for (var field in source) {
+            if (omitNulls && field == null)
+                return;
+
             if (destination.hasOwnProperty(field) && typeof (source[field]) == typeof (destination[field]))
                 destination[field] = source[field];
         }
