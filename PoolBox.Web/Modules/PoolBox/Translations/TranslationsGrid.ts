@@ -47,6 +47,9 @@ namespace PoolBox.PoolBox {
             My.disableHtmlElement(this.elements.columnsBar);
             My.hideHtmlElement(this.elements.addButton);
             My.showHtmlElement(this.elements.importButton);
+            this.setTitle('Translations - Import mode');
+            this.elements.refreshButton.classList.remove('refresh-button');
+            this.elements.refreshButton.classList.add('back-button');
         }
 
         protected deactivateImportMode() {
@@ -56,18 +59,32 @@ namespace PoolBox.PoolBox {
             My.enableHtmlElement(this.elements.columnsBar);
             My.showHtmlElement(this.elements.addButton);
             My.hideHtmlElement(this.elements.importButton);
+            this.setTitle('Translations');
+            this.elements.refreshButton.classList.remove('back-button');
+            this.elements.refreshButton.classList.add('refresh-button');
+            this.hideErrorColumn();
         }
 
         protected pasteRowsOntoGrid(rows: TranslationsRow[]) {
             this.assignTemporaryIdToPastedRows(rows);
-            this.view.setItems(rows);
-            this.activateImportMode();
+
+            this.view.setItems(
+                this.isImportMode ? this.view.getItems().concat(rows) : rows
+            );
+
+            if (!this.isImportMode)
+                this.activateImportMode();
         }
 
         protected assignTemporaryIdToPastedRows(rows: TranslationsRow[]) {
-            rows.forEach((row, idx) => {
-                row.TrId = (-1) * (idx + 1)
-            })
+            let startId = 0;
+
+            if (this.isImportMode && this.view.getItems().length > 0) {
+                startId = this.view.getItems()
+                    .reduce((previous, current) => previous < current ? previous : current).TrId;
+            } 
+
+            rows.forEach(row => row.TrId = --startId);
         }
 
         protected getButtons(): Serenity.ToolButton[] {
@@ -89,14 +106,8 @@ namespace PoolBox.PoolBox {
                         TranslationsService.CSVFileFormatAndCheck,
                         this.pasteRowsOntoGrid.bind(this)
                     );
-                    dialog.element.on('dialogclose',
-                        () => {
-                            this.refresh();
-                            dialog = null;
-                        });
                     dialog.dialogOpen();
-                },
-                separator: true
+                }
             });
             
             return buttons;
@@ -158,7 +169,8 @@ namespace PoolBox.PoolBox {
         }
 
         protected hideErrorColumn() {
-            var cols = this.slickGrid.getColumns().filter(x => x.name != 'Error');
+            var columns = this.slickGrid.getColumns();
+            let cols = columns.filter(x => x.name != 'Error');
             this.slickGrid.setColumns(cols);
         }
 
@@ -186,11 +198,13 @@ namespace PoolBox.PoolBox {
                 e.preventDefault();
                 
                 if (target.hasClass('delete-row')) {
-                    // -- this.isImportMode
-                    TranslationsService.Delete(
-                        { EntityId: item.TrId },
-                        () => { this.refresh(); }
-                    );
+                    if (this.isImportMode)
+                        this.view.setItems(this.view.getItems().filter(x => x.TrId != item.TrId))
+                    else
+                        TranslationsService.Delete(
+                            { EntityId: item.TrId },
+                            () => { this.refresh(); }
+                        );
                 }
             }
         }

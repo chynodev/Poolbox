@@ -21,7 +21,7 @@
     }
 
     export function  hideHtmlElement(element: HTMLElement) {
-        element.style.display = 'none;'
+        element.style.display = 'none'
     }
 
     export function  showHtmlElement(element: HTMLElement, displayValue: string = 'block') {
