@@ -12,8 +12,8 @@ namespace PoolBox.Web.Modules.Common.Helpers
             var end = worksheet.Dimension.End;
             for (int row = start.Row; row <= end.Row; row++)
             {
-                yield return worksheet.Cells
-                    .ToDictionary(x => worksheet.Cells[row, start.Column, row, end.Column]);
+                var index = 0;
+                yield return worksheet.Cells[row, start.Column, row, end.Column].ToDictionary(x => index++, x => x.Text);
             }
         }
     }
