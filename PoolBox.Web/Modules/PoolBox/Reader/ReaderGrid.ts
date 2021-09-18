@@ -16,6 +16,7 @@ namespace PoolBox.PoolBox {
         protected highlightStart: number;
         protected highlightEnd: number;
         private readonly highlightedTxtClass = "highlighted-text";
+        private readonly selectedTxtClass = "selected-text";
         protected textHighlighter: TextHighlighter;
         protected wordInfoPanel: WordInfoPanel;
 
@@ -137,7 +138,10 @@ namespace PoolBox.PoolBox {
                                 {
                                     Text: selectedText
                                 },
-                                (response) => console.log(response.TranslatedText),
+                                (response) => {
+                                    console.log(response.Row);
+
+                                },
                                 { async: true }
                             );
                         }
@@ -148,6 +152,8 @@ namespace PoolBox.PoolBox {
                 }
             });
         }
+
+        
 
         protected setReaderMouseOverAction() {
             this.elements.grid.addEventListener('mouseover', e => {

@@ -26,13 +26,13 @@ namespace PoolBox.PoolBox.Endpoints
         private readonly string BaseUrl = $"https://translation.googleapis.com/language/translate/v2";
 
         [HttpPost]
-        public CloudTranslateResponse Translate(IDbConnection connection, CloudTranslateRequest request, [FromServices]IConfiguration configuration)
+        public CloudTranslateResponse Translate(IUnitOfWork uow, CloudTranslateRequest request, [FromServices]IConfiguration configuration)
         {
             Uri baseUrl = new Uri(BaseUrl);
             var client = new RestClient(baseUrl);
             var req = new RestRequest(Method.POST);
 
-            var languagePair = LanguagePairsRepository.GetCurrent(connection, Context);
+            var languagePair = LanguagePairsRepository.GetCurrent(uow.Connection, Context);
             
             req.AddQueryParameter("q", request.Text)
                 .AddQueryParameter("source", languagePair.TranslateFrom)
@@ -42,10 +42,26 @@ namespace PoolBox.PoolBox.Endpoints
             var response = client.Execute(req);
             
             dynamic responseObj = JsonConvert.DeserializeObject(response.Content);
-            
             string translatedText = responseObj.data?.translations[0].translatedText.Value;
+            MyRow row = null;
+            
+            if (!translatedText.IsEmptyOrNull())
+            {
+                var rowId = new TranslationsRepository(Context).Create(
+                    uow,
+                    new SaveRequest<MyRow>
+                    {
+                        Entity = new MyRow
+                        {
+                            Original = request.Text,
+                            Translated = translatedText
+                        }
+                    }
+                ).EntityId;
 
-            return new CloudTranslateResponse { TranslatedText = translatedText };
+                row = uow.Connection.TryById<MyRow>(rowId);
+            }
+            return new CloudTranslateResponse { Row = row } ;
         }
     }
 }

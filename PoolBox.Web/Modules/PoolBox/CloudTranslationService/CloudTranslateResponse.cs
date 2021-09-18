@@ -1,9 +1,10 @@
-﻿using Serenity.Services;
+﻿using PoolBox.PoolBox.Entities;
+using Serenity.Services;
 
 namespace PoolBox.Responses
 {
     public class CloudTranslateResponse : ServiceResponse
     {
-        public string TranslatedText { get; set; }
+        public TranslationsRow Row { get; set; }
     }
 }
