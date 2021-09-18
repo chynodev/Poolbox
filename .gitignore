@@ -8,6 +8,7 @@ PoolBox.Web/App_data
 PoolBox.Web/Modules/Northwind
 PoolBox.Web/Modules/BasicSamples
 PoolBox.Web/Modules/PoolBox/DictionaryServices/DictionaryApi.cs
+PoolBox.Web/appsettings.json
 PoolBox.Web/NOTES.txt
 APIkeys.json
 

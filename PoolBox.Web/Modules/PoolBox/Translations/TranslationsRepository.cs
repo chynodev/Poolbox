@@ -57,13 +57,7 @@ namespace PoolBox.PoolBox.Repositories
             {
                 base.BeforeSave();
 
-                var languagePairId = new UserPreferenceRepository(Context)
-                    .Retrieve(
-                        Connection,
-                        new UserPreferenceRetrieveRequest { PreferenceType = "LanguagePairPreference", Name = "Language pair ID" }
-                    ).Value;
-
-                Row.PairId = Int32.Parse(languagePairId);
+                Row.PairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
             }
         }
         
@@ -94,11 +88,7 @@ namespace PoolBox.PoolBox.Repositories
             {
                 base.ApplyEqualityFilter(query);
 
-                var languagePairId = new UserPreferenceRepository(Context)
-                    .Retrieve(
-                        Connection,
-                        new UserPreferenceRetrieveRequest { PreferenceType = "LanguagePairPreference", Name = "Language pair ID" }
-                    ).Value;
+                var languagePairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
 
                 query.Where(
                     new Criteria(MyRow.Fields.UserId) == Context.User.GetIdentifier()
