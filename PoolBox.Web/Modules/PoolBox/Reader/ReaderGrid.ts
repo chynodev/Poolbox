@@ -116,6 +116,7 @@ namespace PoolBox.PoolBox {
             });
         }
 
+        // action executed after selecting text
         protected setReaderOnMouseUpAction() {
             this.elements.grid.addEventListener('mouseup', e => {
                 const isTextSelected = [undefined, null, -1].every(x => x !== this.highlightStart && x !== this.highlightEnd);
@@ -126,8 +127,22 @@ namespace PoolBox.PoolBox {
                         this.textHighlighter.selectHighlightedText();
                         this.highlightStart = this.highlightEnd = -1;
 
-                        if (selectedWords.length === 1)
-                            this.fetchDictionaryData(selectedWords[0].innerHTML);
+                        if (selectedWords.length > 0) {
+                            let selectedText = this.getTextFromWordElements(selectedWords);
+
+                            if (selectedWords.length === 1)
+                                this.fetchDictionaryData(selectedText);
+
+                            CloudTranslationService.Translate(
+                                {
+                                    Text: selectedText
+                                },
+                                (response) => console.log(response.TranslatedText),
+                                { async: true }
+                            );
+                        }
+
+                        
                     }
                     this.isMouseKeyPressed = false;
                 }
@@ -147,10 +162,6 @@ namespace PoolBox.PoolBox {
 
                     } else {
                         selectedText = this.textHighlighter.highlightText(this.highlightStart, this.highlightEnd);
-
-                        //if (selectedText)
-                        // EXECUTE TRANSLATION
-                        // TRANSLATE IF TEXT CONTAINS MORE THAN ONE WORD, TRANSLATE AND CALL A DICTIONARY IF TEXT CONTAINS 1 WORD
                     }
                 }
             });
@@ -205,6 +216,13 @@ namespace PoolBox.PoolBox {
 
             this.element[0].appendChild(this.elements.readerAndPanel);
             this.elements.grid.classList.add('box', 'box-primary');
+        }
+
+        protected getTextFromWordElements(wordList: NodeListOf<Element> | Element[]) {
+            let text: string[] = [];
+            wordList.forEach((el: Element, idx) => text[idx] = el.innerHTML);
+
+            return text.join(' ');
         }
     }
 

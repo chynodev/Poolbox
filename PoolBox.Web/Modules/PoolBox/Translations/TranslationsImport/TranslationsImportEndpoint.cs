@@ -52,21 +52,13 @@ namespace PoolBox.PoolBox.Endpoints
         {
             var rows = new List<MyRow>();
             
-            foreach (ChoETL.ChoDynamicObject item in rdr)
+            foreach (dynamic row in rdr)
             {
+                var item = row.GetType() == typeof(ChoETL.ChoDynamicObject) ? row : ChoETL.ChoDynamicObject.FromDictionary(row);
+
                 MyRow newRow = CreateImportableRow(item);
                 rows.Add(newRow);
             }
-            //try
-            //{
-            //    foreach (ChoETL.ChoDynamicObject item in rdr)
-            //    {
-            //        MyRow newRow = CreateImportableRow(item);
-            //        rows.Add(newRow);
-            //    }
-            //}
-            //catch (Exception exc){ }
-            
             return new ListResponse<MyRow> { Entities = rows};
         }
 

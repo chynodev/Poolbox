@@ -5,24 +5,22 @@ using Serenity.Data;
 using Serenity.Services;
 using System;
 using System.Data;
-using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
+using System.Linq;
+using MyRow = PoolBox.PoolBox.Entities.LanguagePairsRow;
 
 namespace PoolBox.PoolBox.Repositories
 {
-    public class TranslationsRepository : BaseRepository
+    public class LanguagePairsRepository : BaseRepository
     {
         private static MyRow.RowFields Fld => MyRow.Fields;
 
-        public TranslationsRepository(IRequestContext context)
+        public LanguagePairsRepository(IRequestContext context)
             : base(context)
         {
         }
 
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            request.Entity.UserId = Int32.Parse(Context.User.GetIdentifier());
-            request.Entity.PairId = 2;
-
             return new MySaveHandler(Context).Process(uow, request, SaveRequestType.Create);
         }
 
@@ -46,18 +44,29 @@ namespace PoolBox.PoolBox.Repositories
             return new MyListHandler(Context).Process(connection, request);
         }
 
+        public static int GetCurrentId(IDbConnection connection, IRequestContext context)
+        {
+            return Int32.Parse(new UserPreferenceRepository(context)
+                    .Retrieve(
+                        connection,
+                        new UserPreferenceRetrieveRequest { PreferenceType = "LanguagePairPreference", Name = "Language pair ID" }
+                    ).Value);
+        }
+
+        public static MyRow GetCurrent(IDbConnection connection, IRequestContext context)
+        {
+            return connection
+                .List<MyRow>()
+                .FirstOrDefault(
+                    x => x.PairId == GetCurrentId(connection, context)
+                );
+        }
+
         private class MySaveHandler : SaveRequestHandler<MyRow> 
         {
             public MySaveHandler(IRequestContext context)
                 : base(context)
             {
-            }
-
-            protected override void BeforeSave()
-            {
-                base.BeforeSave();
-
-                Row.PairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
             }
         }
         
@@ -82,18 +91,6 @@ namespace PoolBox.PoolBox.Repositories
             public MyListHandler(IRequestContext context)
                 : base(context)
             {
-            }
-
-            protected override void ApplyEqualityFilter(SqlQuery query)
-            {
-                base.ApplyEqualityFilter(query);
-
-                var languagePairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
-
-                query.Where(
-                    new Criteria(MyRow.Fields.UserId) == Context.User.GetIdentifier()
-                    && new Criteria(MyRow.Fields.PairId) == languagePairId
-                );
             }
         }
     }

@@ -112,6 +112,7 @@ namespace PoolBox
                 loggingBuilder.AddDebug();
             });
 
+            services.AddSingleton(Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IReportRegistry, ReportRegistry>();
             services.AddSingleton<IDataMigrations, DataMigrations>();

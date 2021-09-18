@@ -8,6 +8,12 @@
       "Key": "Default",
       "Tables": [
         {
+          "Tablename": "dbo.LANGUAGE_PAIRS",
+          "Identifier": "LanguagePairs",
+          "Module": "PoolBox",
+          "PermissionKey": "Administration:General"
+        },
+        {
           "Tablename": "dbo.TRANSLATIONS",
           "Identifier": "Translations",
           "Module": "PoolBox",

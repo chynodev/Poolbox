@@ -1,0 +1,14 @@
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer.Get("Db.PoolBox.LanguagePairs.EntityPlural");
+}
+
+<div id="GridDiv"></div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new PoolBox.PoolBox.LanguagePairsGrid($('#GridDiv'), {}).init();
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>
