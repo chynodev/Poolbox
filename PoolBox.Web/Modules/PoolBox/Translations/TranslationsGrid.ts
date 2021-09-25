@@ -42,11 +42,11 @@ namespace PoolBox.PoolBox {
 
         protected activateImportMode() {
             this.isImportMode = true;
-            My.hideHtmlElement(this.elements.saveButton);
-            My.disableHtmlElement(this.elements.searchBar);
-            My.disableHtmlElement(this.elements.columnsBar);
-            My.hideHtmlElement(this.elements.addButton);
-            My.showHtmlElement(this.elements.importButton);
+            Help.hideHtmlElement(this.elements.saveButton);
+            Help.disableHtmlElement(this.elements.searchBar);
+            Help.disableHtmlElement(this.elements.columnsBar);
+            Help.hideHtmlElement(this.elements.addButton);
+            Help.showHtmlElement(this.elements.importButton);
             this.setTitle('Translations - Import mode');
             this.elements.refreshButton.classList.remove('refresh-button');
             this.elements.refreshButton.classList.add('back-button');
@@ -54,11 +54,11 @@ namespace PoolBox.PoolBox {
 
         protected deactivateImportMode() {
             this.isImportMode = false;
-            My.showHtmlElement(this.elements.saveButton);
-            My.enableHtmlElement(this.elements.searchBar);
-            My.enableHtmlElement(this.elements.columnsBar);
-            My.showHtmlElement(this.elements.addButton);
-            My.hideHtmlElement(this.elements.importButton);
+            Help.showHtmlElement(this.elements.saveButton);
+            Help.enableHtmlElement(this.elements.searchBar);
+            Help.enableHtmlElement(this.elements.columnsBar);
+            Help.showHtmlElement(this.elements.addButton);
+            Help.hideHtmlElement(this.elements.importButton);
             this.setTitle('Translations');
             this.elements.refreshButton.classList.remove('back-button');
             this.elements.refreshButton.classList.add('refresh-button');

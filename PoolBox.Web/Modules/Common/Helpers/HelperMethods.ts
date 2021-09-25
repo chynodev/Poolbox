@@ -43,14 +43,17 @@
     export function createElement(opt: ElementOptions) {
         let element = document.createElement(opt.tagName);
 
-        opt.classNames.forEach(klass => element.classList.add(klass));
-        element.id = opt.id;
-        element.innerHTML = opt.innerHtml;
+        opt.classNames?.forEach(x => element.classList.add(x));
+
+        if (opt.id)
+            element.id = opt.id;
+        if (opt.innerHtml)
+            element.innerHTML = opt.innerHtml;
 
         if (opt.parentElement)
             opt.parentElement.append(element);
 
-        opt.childElements.forEach(child => element.append(child));
+        opt.childElements?.forEach(child => element.append(child));
 
         return element;
     }
