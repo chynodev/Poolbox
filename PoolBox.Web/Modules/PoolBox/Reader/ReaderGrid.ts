@@ -16,6 +16,7 @@ namespace PoolBox.PoolBox {
         protected highlightStart: number;
         protected highlightEnd: number;
         private readonly highlightedTxtClass = "highlighted-text";
+        private readonly selectedTxtClass = "selected-text";
         protected textHighlighter: TextHighlighter;
         protected wordInfoPanel: WordInfoPanel;
 
@@ -137,7 +138,10 @@ namespace PoolBox.PoolBox {
                                 {
                                     Text: selectedText
                                 },
-                                (response) => console.log(response.TranslatedText),
+                                (response) => {
+                                    console.log(response.Row);
+                                    this.displayTranslation(selectedWords, response.Row.Translated);
+                                },
                                 { async: true }
                             );
                         }
@@ -147,6 +151,41 @@ namespace PoolBox.PoolBox {
                     this.isMouseKeyPressed = false;
                 }
             });
+        }
+
+        private displayTranslation(words: NodeListOf<Element>, translation: string) {
+            
+            if (words.length === 1) {
+                (words[0] as HTMLElement).classList.add(this.selectedTxtClass);
+                words[0].innerHTML =
+                    `<div class="translated-text">${translation}</div>` +
+                    `<div class="original-text">${words[0].innerHTML}</div>`;
+            } else if (words.length > 1) {
+                let textContainer = Help.createElement({
+                    tagName: 'span',
+                    classNames: [this.selectedTxtClass]
+                });
+                words[0].parentElement.insertBefore(textContainer, words[0]);
+
+                let translatedText = Help.createElement({
+                    tagName: 'div',
+                    classNames: ['translated-text'],
+                    innerHtml: translation,
+                    parentElement: textContainer,
+                });
+
+                let originalText = Help.createElement({
+                    tagName: 'div',
+                    classNames: ['original-text'],
+                    parentElement: textContainer,
+                    childElements: words
+                });
+                words.forEach(word => originalText.append(word));
+
+                textContainer.append(translatedText);
+                textContainer.append(originalText);
+            }
+
         }
 
         protected setReaderMouseOverAction() {

@@ -1,4 +1,4 @@
-﻿namespace PoolBox.My {
+﻿namespace PoolBox.Help {
 
     /**
      * Maps all identical fields of one object to another
@@ -30,5 +30,31 @@
     export function  showHtmlElement(element: HTMLElement, displayValue: string = 'block') {
         element.style.display = displayValue;
     }
+    
+    export interface ElementOptions {
+        tagName: string,
+        classNames?: string[],
+        id?: string,
+        innerHtml?: string,
+        parentElement?: Element,
+        childElements?: Element[] | NodeListOf<Element>
+    }
 
+    export function createElement(opt: ElementOptions) {
+        let element = document.createElement(opt.tagName);
+
+        opt.classNames?.forEach(x => element.classList.add(x));
+
+        if (opt.id)
+            element.id = opt.id;
+        if (opt.innerHtml)
+            element.innerHTML = opt.innerHtml;
+
+        if (opt.parentElement)
+            opt.parentElement.append(element);
+
+        opt.childElements?.forEach(child => element.append(child));
+
+        return element;
+    }
 }
