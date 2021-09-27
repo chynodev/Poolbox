@@ -99,6 +99,13 @@ namespace PoolBox.PoolBox.Entities
             set => fields.Interval[this] = value;
         }
 
+        [DisplayName("Create date"), Column("CREATE_DATE")]
+        public DateTime? CreateDate
+        {
+            get => fields.CreateDate[this];
+            set => fields.CreateDate[this] = value;
+        }
+
         [NotMapped, DefaultValue(false), MinSelectLevel(SelectLevel.List)]
         public Boolean? IsRepeated
         {
@@ -133,6 +140,7 @@ namespace PoolBox.PoolBox.Entities
             public Int64Field PairId;
             public Int32Field UserId;
             public StringField Username;
+            public DateTimeField CreateDate;
             public DateTimeField DueDate;
             public SingleField EasinessFactor;
             public Int32Field Repetition;

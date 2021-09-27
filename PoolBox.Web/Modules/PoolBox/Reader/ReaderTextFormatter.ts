@@ -31,7 +31,7 @@
                 for (let i = 0; i < word.length; i++) {
                     if (!TextFormatter.isLetter(word[i])) {
                         nonWordStartIdx ??= i;
-
+                        
                         if (i > 0 && TextFormatter.isLetter(word[i - 1]))
                             separatedWords[idx] += addWord(word.slice(wordStartIdx, i));
 

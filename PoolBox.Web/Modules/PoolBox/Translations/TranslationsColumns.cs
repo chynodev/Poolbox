@@ -18,6 +18,8 @@ namespace PoolBox.PoolBox.Columns
         [EditLink]
         public String NounGender { get; set; }
         [Hidden]
+        public DateTime? CreateDate { get; set; }
+        [Hidden]
         public String Error { get; set; }
 
     }
