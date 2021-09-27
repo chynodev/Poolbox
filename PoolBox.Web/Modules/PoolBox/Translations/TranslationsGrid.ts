@@ -47,6 +47,7 @@ namespace PoolBox.PoolBox {
             Help.disableHtmlElement(this.elements.columnsBar);
             Help.hideHtmlElement(this.elements.addButton);
             Help.showHtmlElement(this.elements.importButton);
+            Help.disableHtmlElement(this.elements.columnPickerButton);
             this.setTitle('Translations - Import mode');
             this.elements.refreshButton.classList.remove('refresh-button');
             this.elements.refreshButton.classList.add('back-button');
@@ -59,6 +60,7 @@ namespace PoolBox.PoolBox {
             Help.enableHtmlElement(this.elements.columnsBar);
             Help.showHtmlElement(this.elements.addButton);
             Help.hideHtmlElement(this.elements.importButton);
+            Help.enableHtmlElement(this.elements.columnPickerButton);
             this.setTitle('Translations');
             this.elements.refreshButton.classList.remove('back-button');
             this.elements.refreshButton.classList.add('refresh-button');
@@ -89,7 +91,7 @@ namespace PoolBox.PoolBox {
 
         // -- override
         protected getButtons(): Serenity.ToolButton[] {
-            let buttons = super.getButtons().filter(x => x.cssClass != 'column-picker-button');
+            let buttons = super.getButtons();//.filter(x => x.cssClass != 'column-picker-button');
 
             buttons.push({
                 title: 'Import',
@@ -271,6 +273,8 @@ namespace PoolBox.PoolBox {
         public addButton = document.querySelector('.add-button') as HTMLElement;
         public importButton = document.querySelector('.apply-changes-button') as HTMLElement;
         public uploadCsvFileButton = document.querySelector('.export-csv-button') as HTMLElement;
+        public columnPickerButton = document.querySelector('.column-picker-button') as HTMLElement;
+
     }
 
 }
