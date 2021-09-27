@@ -51,7 +51,7 @@ namespace PoolBox.PoolBox {
 
                 this.elements.grid.innerHTML = TextFormatter.wrapWordsInSpanElement(this.clipboardText);
 
-                let words = this.elements.grid.querySelectorAll('.word') as NodeListOf<HTMLWordElement>;
+                let words = this.elements.grid.querySelectorAll('.word, .non-word') as NodeListOf<HTMLWordElement>;
                 this.textHighlighter = new TextHighlighter(words);
 
             }, false)
@@ -66,7 +66,7 @@ namespace PoolBox.PoolBox {
 
         protected renderFileContents(response: Responses.FileImportResponse): void {
             this.elements.grid.innerHTML = TextFormatter.wrapWordsInSpanElement(response.Text);
-            let words = this.elements.grid.querySelectorAll('.word') as NodeListOf<HTMLWordElement>;
+            let words = this.elements.grid.querySelectorAll('.word, .non-word') as NodeListOf<HTMLWordElement>;
             this.textHighlighter = new TextHighlighter(words);
         }
 
@@ -258,6 +258,7 @@ namespace PoolBox.PoolBox {
         }
 
         protected getTextFromWordElements(wordList: NodeListOf<Element> | Element[]) {
+            //TODO: non-words are not separated by space
             let text: string[] = [];
             wordList.forEach((el: Element, idx) => text[idx] = el.innerHTML);
 
