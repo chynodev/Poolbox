@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Serenity;
 using Serenity.Data;
 using Serenity.Services;
-using System.Data;
 using Microsoft.AspNetCore.Mvc;
-using MyRepository = PoolBox.PoolBox.Repositories.TranslationsRepository;
 using MyRow = PoolBox.PoolBox.Entities.TranslationsRow;
 using PoolBox.Requests;
 using PoolBox.Responses;
 using Microsoft.Extensions.Configuration;
 using PoolBox.PoolBox.Repositories;
 using RestSharp;
-using System.Text.Json;
 using Newtonsoft.Json;
+using PoolBox.CloudTranslationService;
 
 namespace PoolBox.PoolBox.Endpoints
 {
-    [Route("Services/PoolBox/CloudTranslation/[action]")]
+    [Route("CloudServices/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class CloudTranslationController : ServiceEndpoint
     {
@@ -63,5 +59,52 @@ namespace PoolBox.PoolBox.Endpoints
             }
             return new CloudTranslateResponse { Row = row } ;
         }
+
+        [HttpPost]
+        public TextToSpeechResponse GetTextToSpeechRecording(IUnitOfWork uow, CloudTranslateRequest request, [FromServices] IConfiguration configuration)
+        {
+            Uri baseUrl = new Uri("https://texttospeech.googleapis.com/v1beta1/text:synthesize");
+            var client = new RestClient(baseUrl);
+            var req = new RestRequest(Method.POST);
+
+            var languagePair = LanguagePairsRepository.GetCurrent(uow.Connection, Context);
+
+            req.AddQueryParameter("key", configuration["ApiKeys:TextToSpeech"]);
+
+            var audioConfig = new AudioConfig
+            {
+                audioEncoding = "LINEAR16",
+                pitch = 0,
+                speakingRate = 1
+            };
+
+            var input = new Input 
+            {
+                text = request.Text
+            };
+
+            var voice = new Voice
+            {
+                languageCode = languagePair.TranslateTo,
+                name = LanguageCountryCodes
+                    .getCodes
+                    .First(x => x.Contains($"{languagePair.TranslateTo.ToLower()}-")) + "-Wavenet-A"
+            };
+
+            req.AddJsonBody(new { 
+                    audioConfig = audioConfig,
+                    input = input,
+                    voice = voice
+                }
+            );
+
+            var response = client.Execute(req);
+
+            dynamic responseObj = JsonConvert.DeserializeObject(response.Content);
+            string audioRecordingCode = responseObj?.audioContent;
+
+            return new TextToSpeechResponse { audioCode = audioRecordingCode };
+        }
+
     }
 }
