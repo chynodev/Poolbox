@@ -20,13 +20,22 @@
         font-size: 14px;
     }
 
+    #audio-recording-container {
+        visibility: hidden;
+        margin-left: 20px;
+        font-size: 20px;
+        cursor: pointer;
+        display: inline-block;
+    }
+
 </style>
 
 <div class="box box-primary">
     <div class="box-header with-border">
         <h1 id="word-name" class="box-title"></h1>
-        <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+        <div id="audio-recording-container">
+            <i class="fa fa-volume-up"></i>
+            <audio id="audio-recording"/>
         </div>
     </div>
     
