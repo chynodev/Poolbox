@@ -49,7 +49,7 @@ namespace PoolBox.PoolBox.Entities
             set => fields.NounGender[this] = value;
         }
 
-        [DisplayName("WordType"), Column("WORD_TYPE"), Size(50)]
+        [DisplayName("Word type"), Column("WORD_TYPE"), Size(50)]
         public String WordType
         {
             get => fields.WordType[this];

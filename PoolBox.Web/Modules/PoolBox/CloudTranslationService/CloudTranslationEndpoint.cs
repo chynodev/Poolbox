@@ -15,7 +15,7 @@ using PoolBox.CloudTranslationService;
 
 namespace PoolBox.PoolBox.Endpoints
 {
-    [Route("CloudServices/[action]")]
+    [Route("/CloudServices/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class CloudTranslationController : ServiceEndpoint
     {

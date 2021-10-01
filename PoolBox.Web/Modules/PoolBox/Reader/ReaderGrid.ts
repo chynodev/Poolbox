@@ -37,7 +37,7 @@ namespace PoolBox.PoolBox {
             this.wordInfoPanel = new WordInfoPanel(
                 $('#word-info-panel'),
                 {
-                    hideToolbar: true,
+                    hideToolbar: false,
                     title: 'Edit Translation',
                     onDeleteGridAction: null,
                     onSaveGridAction: null
@@ -141,6 +141,7 @@ namespace PoolBox.PoolBox {
                                 (response) => {
                                     console.log(response.Row);
                                     this.displayTranslation(selectedWords, response.Row.Translated);
+                                    this.wordInfoPanel.renderTranslation(response.Row);
                                 },
                                 { async: true }
                             );
@@ -209,29 +210,29 @@ namespace PoolBox.PoolBox {
         protected fetchDictionaryData(word: string) {
             var req: Requests.TranslationRequest = { Word: word }
 
-            // TODO: get current language and call service based on it
+            // TODO: THIS WILL BE CALLED ON THE BACKEND
 
-            ReaderService.Translate(req, (response) => {
-                //console.log(JSON.parse(response.Data));
-                let respJson = JSON.parse(response.Data);
-                //let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
+            //ReaderService.Translate(req, (response) => {
+            //    //console.log(JSON.parse(response.Data));
+            //    let respJson = JSON.parse(response.Data);
+            //    //let entity = DictionaryParsers.SpanishParser.getTranslationData(respJson);
 
-                this.updateWordInfoPanel(word);
+            //    this.updateWordInfoPanel(word);
 
-                //entity.Original = text;
+            //    //entity.Original = text;
 
-                //if ('shortdef' in respJson[0]) {
-                //    let req: Serenity.SaveRequest<TranslationsRow> = {
-                //        Entity: entity
-                //    };
+            //    //if ('shortdef' in respJson[0]) {
+            //    //    let req: Serenity.SaveRequest<TranslationsRow> = {
+            //    //        Entity: entity
+            //    //    };
 
-                //    TranslationsService.Create(
-                //        req,
-                //        response => console.log('Word successfully added to database')
-                //    );
-                //}
+            //    //    TranslationsService.Create(
+            //    //        req,
+            //    //        response => console.log('Word successfully added to database')
+            //    //    );
+            //    //}
 
-            });
+            //});
         }
 
         protected updateWordInfoPanel(word: string) {
