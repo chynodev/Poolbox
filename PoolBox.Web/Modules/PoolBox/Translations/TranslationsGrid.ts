@@ -210,6 +210,17 @@ namespace PoolBox.PoolBox {
                 maxWidth: 24
             });
 
+            columns.push({
+                field: 'Audio recording',
+                name: '',
+                format: ctx => '<div class="inline-action audio-recording">'
+                    + '<i class="fa fa-volume-up"></i>'
+                    + '<audio /></div>',
+                width: 24,
+                minWidth: 24,
+                maxWidth: 24
+            });
+
             this.errorColumn = Q.first(columns, x => x.field == 'Error');
 
             return columns;
@@ -253,7 +264,30 @@ namespace PoolBox.PoolBox {
                 if (target.hasClass('delete-row')) {
                     this.deleteRow(item.TrId)
                 }
+
+                if (target.hasClass('audio-recording')) {
+                    this.playAudioRecording(item, target);      
+                }
             }
+        }
+
+        protected playAudioRecording(item: TranslationsRow, target: JQuery) {
+            let audioEl = target[0].querySelector('audio') as HTMLAudioElement;
+            if (audioEl.src) {
+                audioEl.play();
+                return;
+            }
+            CloudTranslationService.GetTextToSpeechRecording(
+                {
+                    Text: item.Translated
+                },
+                (resp) => {
+                    if (!resp.Error?.Message) {
+                        audioEl.src = 'data:audio/wav;base64,' + resp.audioCode;
+                        audioEl.play();
+                    }
+                }
+            );
         }
 
         // -- override
