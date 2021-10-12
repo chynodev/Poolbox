@@ -32,7 +32,8 @@ namespace PoolBox.PoolBox.Endpoints
                 row.Repetition++;
                 row.Interval = CalculateRepetitionInterval(row.Repetition, (int)row.Interval, (float)row.EasinessFactor);
                 row.EasinessFactor = CalculateEasinessFactor(row.EasinessFactor, (int)quality);
-                row.DueDate = row.DueDate.Value.AddDays((float)row.Interval);
+                row.DueDate = DateTime.Now.AddDays((float)row.Interval);
+                //row.DueDate = row.DueDate.Value.AddDays((float)row.Interval);
             }
             var error = new MyRepository(Context).Update(uow, new SaveRequest<MyRow> { Entity = row, EntityId = row.TrId }).Error;
 
