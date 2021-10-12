@@ -15,7 +15,8 @@
             this.element.removeClass('hidden');
             this.arrange();
 
-            options.onDeleteGridAction ??= this.clearPanel.bind(this);
+            if (!options.onDeleteGridAction)
+                options.onDeleteGridAction = this.clearPanel.bind(this);
 
             this.elements = new PageElements();
             this.initPanelDialog(options);

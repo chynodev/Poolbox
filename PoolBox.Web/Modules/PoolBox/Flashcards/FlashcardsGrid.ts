@@ -5,8 +5,11 @@ namespace PoolBox.PoolBox {
         protected elements: PageElements;
         protected selectedDeckSize: number;
         protected selectedFlashcardDirection: FlashcardDirection;
+        protected currentCardDirection: FlashcardDirection;
         protected wordInfoPanel: WordInfoPanel;
         protected cardDeck: TranslationsRow[];
+        // For bi-directional displaying of cards
+        protected secondCardDeck: TranslationsRow[];
         protected reviewedCards: TranslationsRow[] = [];
         protected languagePairId: number;
         protected activeCard: TranslationsRow;
@@ -31,6 +34,7 @@ namespace PoolBox.PoolBox {
                 ((deckSize: number, direction: FlashcardDirection) => {
                     this.selectedDeckSize = deckSize;
                     this.selectedFlashcardDirection = direction;
+                    this.currentCardDirection = direction == FlashcardDirection.Reversed ? FlashcardDirection.Reversed : FlashcardDirection.Standard;
                     this.elements.flashcardsAndPanel.style.display = 'block';
                     this.fetchCardDeck();
                 }).bind(this)
@@ -62,27 +66,58 @@ namespace PoolBox.PoolBox {
             );
         }
 
+        // This is by far the most horrendous abomination I've created
         protected nextCard(quality: Requests.ResponseQuality = null) {
-            if(quality)
+            let isProcessingSecondDeck = this.selectedFlashcardDirection == FlashcardDirection.Bidirectional && this.currentCardDirection == FlashcardDirection.Reversed;
+
+            if (quality != null && !isProcessingSecondDeck)
                 this.processResponseQuality(quality);
 
             let idx = this.cardDeck.indexOf(this.activeCard);
             let previousCard = this.activeCard;
 
-            if (idx == this.cardDeck.length - 1)
-                this.displayCard(this.cardDeck[0])
-            else 
-                this.displayCard(this.cardDeck[idx + 1]);
-
-            if (quality != Requests.ResponseQuality.Bad) {
-                if(quality)
-                    this.reviewedCards.push(previousCard);
+            // quality is not set when card is being deleted
+            if (quality == null) {
                 this.cardDeck.splice(idx, 1);
+                if (this.secondCardDeck)
+                    this.secondCardDeck = this.secondCardDeck.filter(x => x.TrId != this.activeCard.TrId);
+            }
+
+            if (this.cardDeck.length == 0 && this.secondCardDeck)
+                this.reverseDisplayingDirection();
+
+            if (this.cardDeck.length > 0) {
+                if (this.cardDeck.length == 1 && quality != null && quality != Requests.ResponseQuality.Bad && this.secondCardDeck) {
+                    this.reverseDisplayingDirection();
+                    if (!isProcessingSecondDeck)
+                        this.reviewedCards.push(previousCard);
+                    quality = null;    
+                }
+                if (idx >= this.cardDeck.length - 1)
+                    this.displayCard(this.cardDeck[0])
+                else
+                    this.displayCard(this.cardDeck[idx + 1]);
+
+                if (quality != null && quality != Requests.ResponseQuality.Bad) {
+                    if (!isProcessingSecondDeck)
+                        this.reviewedCards.push(previousCard);
+                    this.cardDeck.splice(idx, 1);
+                }
             }
             this.hideTranslation();
 
-            if (this.cardDeck.length == 0) 
-                this.displayReviewedCards();
+            if (this.cardDeck.length == 0) {
+                if (this.secondCardDeck)
+                    this.reverseDisplayingDirection();
+                else
+                    this.displayReviewedCards();
+            } 
+        }
+
+        private reverseDisplayingDirection() {
+            this.cardDeck = Q.deepClone(this.secondCardDeck);
+            this.currentCardDirection = FlashcardDirection.Reversed;
+            this.secondCardDeck = null;
         }
 
         protected displayReviewedCards() {
@@ -103,7 +138,7 @@ namespace PoolBox.PoolBox {
             let ogReviewedWordRow = this.elements.reviewedCardList.querySelector('.reviewed-word-row');
 
             let newReviewedWordRow = ogReviewedWordRow.cloneNode(true);
-            (<HTMLElement>newReviewedWordRow).querySelector('.reviewed-word').innerHTML = card.Original;
+            (<HTMLElement>newReviewedWordRow).querySelector('.reviewed-word').innerHTML = card.Translated;
             (<HTMLElement>newReviewedWordRow).querySelector('.due-in').innerHTML = card.Interval + ' day' + (card.Interval > 1 ? 's' : '');
             this.elements.reviewedCardList.append(newReviewedWordRow);
         }
@@ -116,8 +151,15 @@ namespace PoolBox.PoolBox {
 
         protected displayCard(card: TranslationsRow) {
             this.activeCard = card;
-            this.elements.originalWord.innerHTML = card.Original;
-            this.elements.translatedWord.innerHTML = card.Translated;
+
+            if (this.currentCardDirection == FlashcardDirection.Standard) {
+                this.elements.originalWord.innerHTML = card.Original;
+                this.elements.translatedWord.innerHTML = card.Translated;
+            } else if (this.currentCardDirection == FlashcardDirection.Reversed) {
+                this.elements.originalWord.innerHTML = card.Translated;
+                this.elements.translatedWord.innerHTML = card.Original;
+            } else
+                throw new Error('Current direction of displaying cards is neither "standard" nor "reversed"');
         }
 
         protected areAllRepeated() {
@@ -126,6 +168,7 @@ namespace PoolBox.PoolBox {
 
         protected fetchCardDeck() {
             let date = new Date();
+            let self = this;
             // GMT + 2 midnight 
             date.setHours(26, 0, 0, 0);
 
@@ -142,13 +185,17 @@ namespace PoolBox.PoolBox {
             TranslationsService.List(
                 req,
                 (response) => {
-                    this.cardDeck = response.Entities
-
-                    if (this.isDeckEmpty())
-                        this.elements.originalWord.innerHTML = "You don't have any cards scheduled for today";
+                    self.cardDeck = response.Entities
+                    
+                    if (self.isDeckEmpty())
+                        self.elements.originalWord.innerHTML = "You don't have any cards scheduled for today";
                     else {
-                        let middleCard = this.cardDeck[parseInt((this.cardDeck.length / 2).toString())]
-                        this.displayCard(middleCard);
+                        // In case of bi-directional displaying use same deck again and shuffle it before
+                        if (self.selectedFlashcardDirection == FlashcardDirection.Bidirectional)
+                            self.secondCardDeck = Q.deepClone(self.cardDeck).sort(() => Math.random() - 0.5);
+
+                        let middleCard = self.cardDeck[parseInt((self.cardDeck.length / 2).toString())]
+                        self.displayCard(middleCard);
                     }
                 }
             );
