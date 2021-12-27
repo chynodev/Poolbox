@@ -41,5 +41,10 @@ namespace PoolBox.PoolBox.Endpoints
         {
             return new MyRepository(Context).List(connection, request);
         }
+
+        public MyRow GetCurrent(IDbConnection connection)
+        {
+            return MyRepository.GetCurrent(connection, Context);
+        }
     }
 }
