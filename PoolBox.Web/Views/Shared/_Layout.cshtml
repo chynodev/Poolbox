@@ -86,6 +86,29 @@ else
                         </li>
                     </ul>
                 </div>
+                @*---------------LANGUAGE SELECTION---------------*@
+                <div id="language-selection-btn">
+                    <span>DEUTSCH - ENGLISH</span>
+                    <div id="language-selection-container">
+                        <div id="languages-container">
+                            <div id="original-language-container">
+                                @Html.Label("I speak", "I speak", new { @class = "selection-label" })
+                                @Html.DropDownList("Language",
+                                new List<SelectListItem> { new SelectListItem { Value = "DE", Text = "Germany" }, new SelectListItem { Value = "EN", Text = "English" } },
+                                "",
+                                new { @class = "form-select language-selection", id = "original-language" })
+                            </div>
+                            <div id="target-language-container">
+                                @Html.Label("I learn", "I learn", new { @class = "selection-label" })
+                                @Html.DropDownList("Language",
+                                new List<SelectListItem> { new SelectListItem { Value = "DE", Text = "Germany" }, new SelectListItem { Value = "EN", Text = "English" } },
+                                "",
+                                new { @class = "form-select language-selection", id = "target-language" })
+                            </div>
+                            <button id="language-selection-save-btn" class="okta-btn-design">Save</button>
+                        </div>
+                    </div>
+                </div>
             </nav>
         </header>
 
@@ -151,6 +174,22 @@ else
             new PoolBox.Common.SidebarSearch($('#SidebarSearch'), $('#SidebarMenu')).init();
             new PoolBox.Common.LanguageSelection($('#LanguageSelect'), '@(System.Globalization.CultureInfo.CurrentUICulture.Name)');
             new PoolBox.Common.ThemeSelection($('#ThemeSelect'));
+
+            function setShowingOfLanguageSelection() {
+                let languageSelectionBtn = document.querySelector('#language-selection-btn');
+                let languageSelectionContainer = document.querySelector('#language-selection-container');
+
+                languageSelectionBtn.onmouseover = () => {
+                    languageSelectionContainer.style.display = "flex";
+                }
+                languageSelectionBtn.onmouseout = () => {
+                    languageSelectionContainer.style.display = "none";
+                }
+
+            }
+
+            setShowingOfLanguageSelection();
+
             @RenderSection("PageInitScript", false);
 
             var doLayout = function () {
