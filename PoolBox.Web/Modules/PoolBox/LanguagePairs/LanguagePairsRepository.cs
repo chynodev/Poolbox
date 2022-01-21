@@ -62,6 +62,15 @@ namespace PoolBox.PoolBox.Repositories
                 );
         }
 
+        public static MyRow GetByLanguageCodes(IDbConnection connection, IRequestContext context, string originalLngCode, string targetLngCode)
+        {
+            return connection
+                .List<MyRow>(
+                    new Criteria(MyRow.Fields.TranslateFrom) == targetLngCode &&
+                    new Criteria(MyRow.Fields.TranslateTo) == originalLngCode
+                ).FirstOrDefault();
+        }
+
         private class MySaveHandler : SaveRequestHandler<MyRow> 
         {
             public MySaveHandler(IRequestContext context)

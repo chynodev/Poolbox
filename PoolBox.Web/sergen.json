@@ -18,6 +18,12 @@
           "Identifier": "Translations",
           "Module": "PoolBox",
           "PermissionKey": "Administration:General"
+        },
+        {
+          "Tablename": "dbo.USER_LANGUAGES",
+          "Identifier": "UserLanguages",
+          "Module": "PoolBox",
+          "PermissionKey": "Administration:General"
         }
       ]
     }
