@@ -37,12 +37,12 @@
         }
 
         protected playAudioRecording() {
-            if (!this.currentEntity?.Translated)
+            if (!this.currentEntity?.Original)
                 return;
             let self = this;
             CloudTranslationService.GetTextToSpeechRecording(
                 {
-                    Text: this.currentEntity.Translated
+                    Text: this.currentEntity.Original
                 },
                 (resp) => {
                     if (!resp.Error?.Message) {

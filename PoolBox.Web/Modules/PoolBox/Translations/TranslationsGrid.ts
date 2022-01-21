@@ -279,7 +279,7 @@ namespace PoolBox.PoolBox {
             }
             CloudTranslationService.GetTextToSpeechRecording(
                 {
-                    Text: item.Translated
+                    Text: item.Original
                 },
                 (resp) => {
                     if (!resp.Error?.Message) {

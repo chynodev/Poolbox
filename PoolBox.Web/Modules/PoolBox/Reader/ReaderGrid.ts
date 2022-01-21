@@ -45,6 +45,11 @@ namespace PoolBox.PoolBox {
             );
         }
 
+        // -- remove search bar
+        protected createQuickSearchInput() {
+
+        }
+
         protected addPasteFromClipboardEventListener() {
             window.addEventListener("paste", e => {
                 this.clipboardText = (<ClipboardEvent>e).clipboardData.getData('Text');
@@ -72,7 +77,7 @@ namespace PoolBox.PoolBox {
 
         // ----override
         protected getButtons() {
-            let buttons = super.getButtons();
+            let buttons = [];
 
             buttons.push({
                 cssClass: 'export-pdf-button',
@@ -87,7 +92,7 @@ namespace PoolBox.PoolBox {
                         });
                     dialog.dialogOpen();
                 },
-                separator: true
+                separator: false
             });
 
             return buttons;

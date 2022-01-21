@@ -1,7 +1,18 @@
 ﻿@inject Serenity.ITextLocalizer Localizer
 @inject Serenity.Abstractions.IUserRetrieveService UserRetriever
+@inject PoolBox.PoolBox.Repositories.UserLanguagesRepository UserLanguagesRepo
+@inject Microsoft.Extensions.Configuration.IConfiguration config
+
 <!DOCTYPE html>
 @{
+    var languageSelectionResponse = UserLanguagesRepo.DropDownFeed(new Serenity.Services.ListRequest(), config);
+    var userLanguages = languageSelectionResponse.Languages;
+    var originalLanguageId = languageSelectionResponse.OriginalLanguageId;
+    var targetLanguageId = languageSelectionResponse.TargetLanguageId;
+
+    var originalLanguageName = userLanguages.First(x => x.Id == originalLanguageId).Name;
+    var targetLanguageName = userLanguages.First(x => x.Id == targetLanguageId).Name;
+
     Func<string, HtmlString> json = x => new HtmlString(Serenity.JSON.Stringify(x));
     var hideNav = (string)Context.Request.Query["hideNav"] == "1";
     var logged = User?.Identity?.Name;
@@ -25,155 +36,163 @@
     <title>@(ViewData["Title"]) - PoolBox</title>
 </head>
 <body id="s-@(ViewData["PageId"])Page" class="@(ViewData["BodyClass"]) fixed sidebar-mini hold-transition skin-@theme @(darkSidebar ? "dark-sidebar" : "light-sidebar")@(hideNav ? " no-navigation" : " has-layout-event")@(rtl ? " rtl" : "")">
-<div id="PageBackground" style="display: none"></div>
-@if (hideNav)
-{
-    <script type="text/javascript">
+    <div id="PageBackground" style="display: none"></div>
+    @if (hideNav)
+    {
+        <script type="text/javascript">
         $(function () {
             @RenderSection("PageInitScript", false)
         });
-    </script>
-    <div id="page-outer-nonav">
-        <div id="page-container" class="page-container-common">
-            @RenderBody()
-        </div>
-    </div>
-}
-else
-{
-    <div class="wrapper">
-        <header class="main-header">
-            <a href="~/" class="logo">
-                <span class="logo-mini"><i></i></span>
-                <span class="logo-lg"><i></i><b>@Localizer.Get("Navigation.SiteTitle")</b></span>
-            </a>
-            <nav class="navbar navbar-static-top" role="navigation">
-                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                </a>
-
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="@userImage" class="user-image" alt="User Image">
-                                <span class="hidden-xs">@User?.Identity?.Name</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <!-- User image -->
-                                <li class="user-header">
-                                    <img src="@userImage" class="img-circle" alt="User Image">
-
-                                    <p>
-                                        @(user != null ? user.DisplayName : "")
-                                    </p>
-                                </li>
-
-                                <!-- Menu Footer-->
-                                <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="~/Account/ChangePassword" class="btn btn-default btn-flat"><i class="fa fa-lock fa-fw"></i> @Texts.Forms.Membership.ChangePassword.FormTitle.ToString(Localizer)</a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="~/Account/Signout" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i> @Localizer.Get("Navigation.LogoutLink")</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li>
-                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-sliders"></i></a>
-                        </li>
-                    </ul>
-                </div>
-                @*---------------LANGUAGE SELECTION---------------*@
-                <div id="language-selection-btn">
-                    <span>DEUTSCH - ENGLISH</span>
-                    <div id="language-selection-container">
-                        <div id="languages-container">
-                            <div id="original-language-container">
-                                @Html.Label("I speak", "I speak", new { @class = "selection-label" })
-                                @Html.DropDownList("Language",
-                                new List<SelectListItem> { new SelectListItem { Value = "DE", Text = "Germany" }, new SelectListItem { Value = "EN", Text = "English" } },
-                                "",
-                                new { @class = "form-select language-selection", id = "original-language" })
-                            </div>
-                            <div id="target-language-container">
-                                @Html.Label("I learn", "I learn", new { @class = "selection-label" })
-                                @Html.DropDownList("Language",
-                                new List<SelectListItem> { new SelectListItem { Value = "DE", Text = "Germany" }, new SelectListItem { Value = "EN", Text = "English" } },
-                                "",
-                                new { @class = "form-select language-selection", id = "target-language" })
-                            </div>
-                            <button id="language-selection-save-btn" class="okta-btn-design">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <aside class="main-sidebar">
-            <section class="sidebar">
-                <form action="#" method="get" class="sidebar-form">
-                    <div class="input-group">
-                        <input type="text" id="SidebarSearch" name="q" class="form-control" autocomplete="off">
-                        <span class="input-group-btn">
-                            <button type="button" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
-                        </span>
-                    </div>
-                </form>
-                <ul class="sidebar-menu" id="SidebarMenu">
-                    <partial name="@MVC.Views.Shared.LeftNavigation" model="new PoolBox.Navigation.NavigationModel(Context)" />
-                </ul>
-            </section>
-        </aside>
-
-        <div class="content-wrapper">
-            @if (IsSectionDefined("ContentHeader"))
-            {
-                <section class="content-header">
-                    @RenderSection("ContentHeader")
-                </section>
-            }
-            <section class="content">
+        </script>
+        <div id="page-outer-nonav">
+            <div id="page-container" class="page-container-common">
                 @RenderBody()
-            </section>
-        </div>
-
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                @Texts.Site.Layout.FooterInfo.ToString(Localizer)
             </div>
-            <strong>@Texts.Site.Layout.FooterCopyright.ToString(Localizer)</strong> @Texts.Site.Layout.FooterRights.ToString(Localizer)
-        </footer>
+        </div>
+    }
+    else
+    {
+        <div class="wrapper">
+            <header class="main-header">
+                <a href="~/" class="logo">
+                    <span class="logo-mini"><i></i></span>
+                    <span class="logo-lg"><i></i><b>@Localizer.Get("Navigation.SiteTitle")</b></span>
+                </a>
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
 
-        <aside class="control-sidebar control-sidebar-dark">
-            <div class="tab-content">
-                <div class="tab-pane active" id="control-sidebar-settings-tab">
-                    <form method="post">
-                        <h3 class="control-sidebar-heading">@Texts.Site.Layout.GeneralSettings.ToString(Localizer)</h3>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown user user-menu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <img src="@userImage" class="user-image" alt="User Image">
+                                    <span class="hidden-xs">@User?.Identity?.Name</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <!-- User image -->
+                                    <li class="user-header">
+                                        <img src="@userImage" class="img-circle" alt="User Image">
 
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">@Texts.Site.Layout.Language.ToString(Localizer)</label>
-                            <select id="LanguageSelect" class="form-control"></select>
+                                        <p>
+                                            @(user != null ? user.DisplayName : "")
+                                        </p>
+                                    </li>
+
+                                    <!-- Menu Footer-->
+                                    <li class="user-footer">
+                                        <div class="pull-left">
+                                            <a href="~/Account/ChangePassword" class="btn btn-default btn-flat"><i class="fa fa-lock fa-fw"></i> @Texts.Forms.Membership.ChangePassword.FormTitle.ToString(Localizer)</a>
+                                        </div>
+                                        <div class="pull-right">
+                                            <a href="~/Account/Signout" class="btn btn-default btn-flat"><i class="fa fa-sign-out fa-fw"></i> @Localizer.Get("Navigation.LogoutLink")</a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="#" data-toggle="control-sidebar"><i class="fa fa-sliders"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    @*---------------LANGUAGE SELECTION---------------*@
+                    <div id="language-selection-btn">
+                        <span>@originalLanguageName.ToUpper() - @targetLanguageName.ToUpper()</span>
+                        <div id="language-selection-container">
+                            <div id="languages-container">
+                                <div id="original-language-container">
+                                    @Html.Label("I speak", "I speak", new { @class = "selection-label" })
+                                    @Html.DropDownList("Language",
+                                    new SelectList(userLanguages, "Id", "Name", originalLanguageId),
+                                    "",
+                                    new { @class = "form-select language-selection", id = "original-language" })
+                                </div>
+                                <div id="target-language-container">
+                                    @Html.Label("I learn", "I learn", new { @class = "selection-label" })
+                                    @Html.DropDownList(
+                                       "Language",
+                                       new SelectList(userLanguages, "Id", "Name", targetLanguageId),
+                                       "",
+                                       new { @class = "form-select language-selection", id = "target-language" }
+                                   )
+                                </div>
+                                <button type="submit" id="language-selection-save-btn" class="okta-btn-design" onclick="SaveLanguageSelection()">Save</button>
+                            </div>
                         </div>
+                    </div>
+                </nav>
+            </header>
 
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label class="control-sidebar-subheading">@Texts.Site.Layout.Theme.ToString(Localizer)</label>
-                            <select id="ThemeSelect" class="form-control"></select>
+            <aside class="main-sidebar">
+                <section class="sidebar">
+                    <form action="#" method="get" class="sidebar-form">
+                        <div class="input-group">
+                            <input type="text" id="SidebarSearch" name="q" class="form-control" autocomplete="off">
+                            <span class="input-group-btn">
+                                <button type="button" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
+                            </span>
                         </div>
                     </form>
-                </div>
-            </div>
-        </aside>
-        <div class="control-sidebar-bg"></div>
-    </div>
+                    <ul class="sidebar-menu" id="SidebarMenu">
+                        <partial name="@MVC.Views.Shared.LeftNavigation" model="new PoolBox.Navigation.NavigationModel(Context)" />
+                    </ul>
+                </section>
+            </aside>
 
-    <script type="text/javascript">
+            <div class="content-wrapper">
+                @if (IsSectionDefined("ContentHeader"))
+                {
+                    <section class="content-header">
+                        @RenderSection("ContentHeader")
+                    </section>
+                }
+                <section class="content">
+                    @RenderBody()
+                </section>
+            </div>
+
+            <footer class="main-footer">
+                <div class="pull-right hidden-xs">
+                    @Texts.Site.Layout.FooterInfo.ToString(Localizer)
+                </div>
+                <strong>@Texts.Site.Layout.FooterCopyright.ToString(Localizer)</strong> @Texts.Site.Layout.FooterRights.ToString(Localizer)
+            </footer>
+
+            <aside class="control-sidebar control-sidebar-dark">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="control-sidebar-settings-tab">
+                        <form method="post">
+                            <h3 class="control-sidebar-heading">@Texts.Site.Layout.GeneralSettings.ToString(Localizer)</h3>
+
+                            <div class="form-group">
+                                <label class="control-sidebar-subheading">@Texts.Site.Layout.Language.ToString(Localizer)</label>
+                                <select id="LanguageSelect" class="form-control"></select>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label class="control-sidebar-subheading">@Texts.Site.Layout.Theme.ToString(Localizer)</label>
+                                <select id="ThemeSelect" class="form-control"></select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+            <div class="control-sidebar-bg"></div>
+        </div>
+
+        <script type="text/javascript">
         $().ready(function () {
             new PoolBox.Common.SidebarSearch($('#SidebarSearch'), $('#SidebarMenu')).init();
             new PoolBox.Common.LanguageSelection($('#LanguageSelect'), '@(System.Globalization.CultureInfo.CurrentUICulture.Name)');
             new PoolBox.Common.ThemeSelection($('#ThemeSelect'));
+            var spans = document.querySelectorAll('span');
+            // Hide Theme Samples
+            for (var x of spans) {
+                if (x.innerHTML == 'Theme Samples')
+                   x.remove();
+            }
 
             function setShowingOfLanguageSelection() {
                 let languageSelectionBtn = document.querySelector('#language-selection-btn');
@@ -206,7 +225,38 @@ else
             $(window).bind("load resize layout", doLayout);
             doLayout();
         });
-    </script>
-}
+
+            function SaveLanguageSelection() {
+                var trgtLngSelection = document.getElementById("target-language");
+                var targetLanguageId = trgtLngSelection.value;
+                console.log(targetLanguageId);
+
+                var orgLngSelection = document.getElementById("original-language");
+                var originalLanguageId = orgLngSelection.value;
+
+                var req = { OriginalLanguageId: originalLanguageId, TargetLanguageId: targetLanguageId };
+                var json = JSON.stringify(req).replace(/\\/g, '');
+
+                var data = {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: json
+                };
+
+                fetch(`http://localhost:5000/Services/PoolBox/UserLanguages/SaveLanguageSelection`,
+                    data)
+                    .then(resp => resp.json())
+                    .then(resp => {
+                        if (resp.Error?.Message)
+                            alert(resp.Error.Message)
+                        else
+                            location.reload();
+                    });
+            }
+        </script>
+    }
 </body>
 </html>
