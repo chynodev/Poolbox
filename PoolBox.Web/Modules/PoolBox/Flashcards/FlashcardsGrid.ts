@@ -54,6 +54,9 @@ namespace PoolBox.PoolBox {
         }
 
         protected processResponseQuality(quality: Requests.ResponseQuality) {
+            if (!this.activeCard)
+                return;
+
             var req: Requests.FlashcardsResponseQualityRequest = {
                 Quality: quality,
                 Translation: this.activeCard

@@ -85,10 +85,10 @@ namespace PoolBox.PoolBox.Endpoints
 
             var voice = new Voice
             {
-                languageCode = languagePair.TranslateTo,
+                languageCode = languagePair.TranslateFrom,
                 name = LanguageCountryCodes
                     .getCodes
-                    .First(x => x.Contains($"{languagePair.TranslateTo.ToLower()}-")) + "-Wavenet-A"
+                    .First(x => x.Contains($"{languagePair.TranslateFrom.ToLower()}-")) + "-Wavenet-A"
             };
 
             req.AddJsonBody(new { 
