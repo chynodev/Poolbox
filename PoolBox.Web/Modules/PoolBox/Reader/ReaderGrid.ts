@@ -144,9 +144,11 @@ namespace PoolBox.PoolBox {
                                     Text: selectedText
                                 },
                                 (response) => {
-                                    console.log(response.Row);
-                                    this.displayTranslation(selectedWords, response.Row.Translated);
-                                    this.wordInfoPanel.renderTranslation(response.Row);
+                                    if (response && response.Row) {
+                                        console.log(response.Row);
+                                        this.displayTranslation(selectedWords, response.Row.Translated);
+                                        this.wordInfoPanel.renderTranslation(response.Row);
+                                    }
                                 },
                                 { async: true }
                             );
