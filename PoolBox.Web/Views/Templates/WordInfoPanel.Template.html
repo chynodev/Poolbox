@@ -4,8 +4,14 @@
         flex-direction: column;
     }
 
-    .form-field-container > div.vx{
-        display: none;
+        .form-field-container > div.vx {
+            display: none;
+        }
+
+    #box-info-panel {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .form-field-container > label.caption {
@@ -28,16 +34,28 @@
         display: inline-block;
     }
 
+    #dictionary-container {
+        width: 100%;
+        flex-grow: 5;
+    }
+
+    #dictionary-iframe {
+        width: 100%;
+        height: 100%;
+    }
 </style>
 
-<div class="box box-primary">
+<div id="box-info-panel" class="box box-primary">
     <div class="box-header with-border">
         <h1 id="word-name" class="box-title"></h1>
         <div id="audio-recording-container">
             <i class="fa fa-volume-up"></i>
-            <audio id="audio-recording"/>
+            <audio id="audio-recording" />
         </div>
     </div>
-    
+
     <div id="form-container" class="box-body box-profile"></div>
+    <div id="dictionary-container">
+        <iframe id="dictionary-iframe"></iframe>
+    </div>
 </div>

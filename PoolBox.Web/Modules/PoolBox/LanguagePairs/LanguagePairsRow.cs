@@ -12,16 +12,17 @@ namespace PoolBox.PoolBox.Entities
     [DisplayName("Language Pairs"), InstanceName("Language Pairs")]
     [ReadPermission("Administration:General")]
     [ModifyPermission("Administration:General")]
+    [LookupScript("PoolBox.LanguagePairs")]
     public sealed class LanguagePairsRow : Row<LanguagePairsRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("Pair Id"), Column("PAIR_ID"), Identity, IdProperty]
+        [DisplayName("Pair Id"), Column("PAIR_ID"), Identity, IdProperty, LookupInclude]
         public Int64? PairId
         {
             get => fields.PairId[this];
             set => fields.PairId[this] = value;
         }
 
-        [DisplayName("Translate From"), Column("TRANSLATE_FROM"), Size(50), NotNull, QuickSearch, NameProperty]
+        [DisplayName("Translate From"), Column("TRANSLATE_FROM"), Size(50), NotNull, QuickSearch, NameProperty, LookupInclude]
         public String TranslateFrom
         {
             get => fields.TranslateFrom[this];
