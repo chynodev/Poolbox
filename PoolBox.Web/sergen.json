@@ -14,6 +14,12 @@
           "PermissionKey": "Administration:General"
         },
         {
+          "Tablename": "dbo.MESSAGES",
+          "Identifier": "Messages",
+          "Module": "PoolBox",
+          "PermissionKey": "Administration:General"
+        },
+        {
           "Tablename": "dbo.TRANSLATIONS",
           "Identifier": "Translations",
           "Module": "PoolBox",
