@@ -1,0 +1,190 @@
+﻿@blueClr: #3c8dbc;
+
+#chat-container {
+    height: 600px;
+    width: 1000px;
+    margin: 0;
+    border: 4px solid @blueClr;
+}
+
+#inbox-container {
+    border-right: 2px solid @blueClr;
+    padding: 0;
+    height: 100%;
+}
+
+#inbox-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    color: white;
+    background-color: @blueClr;
+    margin: 0;
+    padding: 15px 10px;
+}
+
+#find-user-container {
+    border-bottom: 1px solid white;
+}
+
+#find-user-container > i {
+    cursor: pointer;
+    padding: 5px;
+}
+
+#find-user-input {
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+}
+
+input:focus, input:active {
+    background-color: transparent;
+    outline: none;
+}
+
+#recent-title {
+    margin: 0;
+}
+
+#inbox-list {
+    padding: 0;
+    margin: 0;
+}
+
+#inbox-list > li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 2px solid @blueClr;
+}
+
+.img-item-container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    height: 90px;
+    color: darkslategray;
+}
+
+.img-container {
+    display: flex;
+    height: 100%;
+    flex-basis: 15%;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-image {
+    border-radius: 25px;
+    width: 80%;
+    height: 50%;
+}
+
+.inbox-item {
+    padding: 5px;
+    flex-basis: 85%;
+}
+
+.name-and-date {
+    display: flex;
+    justify-content: space-between;
+    height: 20%;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.inbox-message {
+    height: 80%;
+    overflow: hidden;
+}
+
+#flex-test {
+    display: flex;
+}
+
+#messages-container {
+    height: 100%;
+    background-color: whitesmoke;
+}
+
+.message-box {
+    list-style: none;
+    padding: 5px 0;
+    display: flex;
+    border-radius: 10px;
+}
+
+.my-message, .their-message {
+    width: 300px;
+}
+
+.my-message {
+    background-color: @blueClr;
+    padding: 5px;
+    color: white;
+}
+
+.my-message > .message-content {
+    flex-basis: 100%;
+}
+
+.their-message {
+    background-color: lightgray;
+}
+
+.their-message > .message-content {
+    flex-basis: 85%;
+}
+
+.selected-message {
+    background-color: lightblue;
+}
+
+.message-time {
+    color: black;
+}
+
+.my-msg-box-container, .their-msg-box-container {
+    margin: 15px 0;
+}
+
+.their-msg-box-container {
+    float: left;
+}
+
+.my-msg-box-container {
+    float: right;
+}
+
+#messages-list {
+    height: 85%;
+}
+
+#send-msg-container {
+    display: flex;
+    align-items: center;
+    height: 10%;
+    margin-top: 10px;
+    border-top: 1px solid gray;
+}
+
+#send-msg-container > * {
+    height: 80%;
+}
+
+#message-input {
+    width: 90%;
+    color: dimgray;
+    font-size: 15px;
+}
+
+#msg-send-btn {
+    width: 10%;
+    font-size: x-large;
+    color: white;
+    background-color: @blueClr;
+    border: none;
+}
