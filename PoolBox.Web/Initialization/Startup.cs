@@ -128,6 +128,7 @@ namespace PoolBox
             services.AddSingleton<IUserRetrieveService, Administration.UserRetrieveService>();
             services.AddSingleton<IPermissionService, Administration.PermissionService>();
             services.AddSingleton<PoolBox.Repositories.UserLanguagesRepository>();
+            services.AddSingleton<Administration.Repositories.UserRepository>();
         }
 
         public static void InitializeLocalTexts(IServiceProvider services)

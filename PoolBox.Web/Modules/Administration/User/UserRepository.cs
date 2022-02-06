@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using PoolBox.Common.Entities;
 using Serenity;
 using Serenity.Abstractions;
@@ -19,7 +21,7 @@ namespace PoolBox.Administration.Repositories
 {
     public partial class UserRepository : BaseRepository
     {
-        public UserRepository(IRequestContext context)
+        public UserRepository([FromServices] IRequestContext context)
             : base(context)
         {
         }
@@ -27,7 +29,19 @@ namespace PoolBox.Administration.Repositories
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
         public static bool IsPublicDemo { get; set; }
 
+        public ListResponse<MyRow> ListWithoutConnection(IConfiguration config)
+        {
+            var sqlConnStrings = Common.DbConnectionHelper.GetDefaultSqlConnections(config);
 
+            using (var conn = sqlConnStrings.NewByKey("Default"))
+            {
+                var response = new MyListHandler(Context).Process(conn, new ListRequest());
+                var admin = response.Entities.Find(x => x.Username == "admin");
+                response.Entities.Remove(admin);
+
+                return response;
+            }
+        }
 
         public static void CheckPublicDemo(int? userID)
         {
