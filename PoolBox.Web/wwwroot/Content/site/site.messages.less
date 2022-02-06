@@ -13,6 +13,24 @@
     height: 100%;
 }
 
+#user-list-container {
+    position: absolute;
+    color: white;
+    background-color: #367fa9;
+    max-height: 300px;
+    min-width: 150px;
+    padding: 10px;
+    font-weight: 600;
+    overflow-y: auto;
+    top: 30px;
+    display: none;
+}
+
+.user-list-item {
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
 #inbox-header-container {
     display: flex;
     justify-content: space-between;
@@ -24,6 +42,7 @@
 }
 
 #find-user-container {
+    position: relative;
     border-bottom: 1px solid white;
 }
 

@@ -1,4 +1,6 @@
-﻿using Serenity;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Serenity;
 using Serenity.Data;
 using Serenity.Services;
 using System;
@@ -11,7 +13,7 @@ namespace PoolBox.PoolBox.Repositories
     {
         private static MyRow.RowFields Fld => MyRow.Fields;
 
-        public MessagesRepository(IRequestContext context)
+        public MessagesRepository([FromServices] IRequestContext context)
             : base(context)
         {
         }
@@ -39,6 +41,16 @@ namespace PoolBox.PoolBox.Repositories
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyListHandler(Context).Process(connection, request);
+        }
+
+        public ListResponse<MyRow> ListWithoutConnection(IConfiguration config)
+        {
+            var sqlConnStrings = Common.DbConnectionHelper.GetDefaultSqlConnections(config);
+
+            using (var conn = sqlConnStrings.NewByKey("Default"))
+            {
+                return new MyListHandler(Context).Process(conn, null);
+            }
         }
 
         private class MySaveHandler : SaveRequestHandler<MyRow> 
