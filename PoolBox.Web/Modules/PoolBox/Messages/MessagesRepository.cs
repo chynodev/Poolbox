@@ -83,6 +83,18 @@ namespace PoolBox.PoolBox.Repositories
                 : base(context)
             {
             }
+
+            protected override void ApplyEqualityFilter(SqlQuery query)
+            {
+                base.ApplyEqualityFilter(query);
+
+                var userId = Context.User.GetIdentifier();
+
+                query.Where(
+                    new Criteria(MyRow.Fields.RecipientId) == userId
+                    || new Criteria(MyRow.Fields.SenderId) == userId
+                );
+            }
         }
     }
 }

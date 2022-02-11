@@ -40,6 +40,16 @@ namespace PoolBox.Administration.Endpoints
             return new MyRepository(Context).Retrieve(connection, request);
         }
 
+        public RetrieveResponse<MyRow> GetLoggedUser(IDbConnection connection)
+        {
+            var loggedUsername = Context.User.Identity.Name;
+            var user = new MyRepository(Context).GetByUsername(connection, loggedUsername);
+
+            var userDto = new MyRow { Username = user.Username, UserId = user.UserId };
+
+            return new RetrieveResponse<MyRow> { Entity = userDto };
+        }
+
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyRepository(Context).List(connection, request);
