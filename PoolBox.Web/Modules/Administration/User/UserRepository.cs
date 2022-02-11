@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using MyRow = PoolBox.Administration.Entities.UserRow;
@@ -84,6 +85,13 @@ namespace PoolBox.Administration.Repositories
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyListHandler(Context).Process(connection, request);
+        }
+
+        public MyRow GetByUsername(IDbConnection connection, string username)
+        {
+            return connection.List<MyRow>(
+                new Criteria(MyRow.Fields.Username) == username
+                ).FirstOrDefault();
         }
 
         public static string ValidateDisplayName(string displayName, ITextLocalizer localizer)
