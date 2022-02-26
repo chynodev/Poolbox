@@ -1,4 +1,5 @@
-﻿using Serenity;
+﻿using PoolBox.Administration;
+using Serenity;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
@@ -10,8 +11,8 @@ namespace PoolBox.PoolBox.Entities
 {
     [ConnectionKey("Default"), Module("PoolBox"), TableName("[dbo].[USER_LANGUAGES]")]
     [DisplayName("User Languages"), InstanceName("User Languages")]
-    [ReadPermission("Administration:General")]
-    [ModifyPermission("Administration:General")]
+    [ReadPermission(PermissionKeys.TranslationsRead)]
+    [ModifyPermission(PermissionKeys.TranslationsWrite)]
     public sealed class UserLanguagesRow : Row<UserLanguagesRow.RowFields>, IIdRow, INameRow
     {
         [DisplayName("Id"), Column("ID"), Identity, IdProperty]

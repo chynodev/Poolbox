@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using PoolBox.AppServices;
+using PoolBox.Common;
+using PoolBox.Hubs;
 using Serenity;
 using Serenity.Abstractions;
 using Serenity.Data;
@@ -31,6 +33,8 @@ namespace PoolBox
         public Startup(IConfiguration configuration, IWebHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
+            DbConnectionHelper.CONNECTION_STRING = configuration[DbConnectionHelper.CONNECTION_STRING_PATH];
+            DbConnectionHelper.PROVIDER_NAME = configuration[DbConnectionHelper.PROVIDER_NAME_PATH];
             HostEnvironment = hostEnvironment;
             SqlSettings.AutoQuotedIdentifiers = true;
             RegisterDataProviders();
@@ -50,7 +54,7 @@ namespace PoolBox
                 typeof(IDynamicScriptManager).Assembly,
                 typeof(Startup).Assembly,
                 //<if:ThemeSamples>
-                typeof(Serenity.Demo.ThemeSamples.AdminLTEController).Assembly,
+                //typeof(Serenity.Demo.ThemeSamples.AdminLTEController).Assembly,
                 //<if:ThemeSamples>
             }));
 
@@ -90,6 +94,8 @@ namespace PoolBox
 
             if (HostEnvironment.IsDevelopment())
                 builder.AddRazorRuntimeCompilation();
+
+            services.AddSignalR();
 
             services.AddAuthentication(o =>
             {
@@ -171,13 +177,14 @@ namespace PoolBox
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.UseDynamicScripts();
             app.UseExceptional();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
 
             app.ApplicationServices.GetRequiredService<IDataMigrations>().Initialize();

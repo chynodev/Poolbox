@@ -13,5 +13,10 @@ namespace PoolBox.Administration
 
         [Description("Languages and Translations")]
         public const string Translation = "Administration:Translation";
+
+        [Description("Translations:Read")]
+        public const string TranslationsRead = "Translations:Read";
+        [Description("Translations:Write")]
+        public const string TranslationsWrite = "Translations:Write";
     }
 }

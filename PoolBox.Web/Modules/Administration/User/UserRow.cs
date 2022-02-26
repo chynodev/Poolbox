@@ -8,9 +8,9 @@ namespace PoolBox.Administration.Entities
 {
     [ConnectionKey("Default"), Module("Administration"), TableName("Users")]
     [DisplayName("Users"), InstanceName("User")]
-    [ReadPermission(PermissionKeys.Security)]
+    [ReadPermission(PermissionKeys.TranslationsRead)]
     [ModifyPermission(PermissionKeys.Security)]
-    [LookupScript(Permission = PermissionKeys.Security)]
+    [LookupScript(/*Permission = PermissionKeys.Security*/)]
     public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, IIsActiveRow
     {
         [DisplayName("User Id"), Identity, IdProperty]

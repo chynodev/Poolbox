@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using PoolBox.Administration.Repositories;
 using Serenity;
 using Serenity.Data;
 using Serenity.Services;
@@ -41,6 +42,38 @@ namespace PoolBox.PoolBox.Repositories
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyListHandler(Context).Process(connection, request);
+        }
+
+        public MyRow CreateWithoutConnection(string senderName, string receiverName, string messageContent)
+        {
+            MyRow row = null;
+            int resp;
+
+            var sqlConnStrings = Common.DbConnectionHelper.GetDefaultSqlConnections(null);
+            using (var conn = sqlConnStrings.NewByKey("Default"))
+            {
+                var senderId = new UserRepository(Context).GetByUsername(conn, senderName).UserId;
+                var receiverId = new UserRepository(Context).GetByUsername(conn, receiverName).UserId;
+
+                using (var uow = new UnitOfWork(conn))
+                {
+                    resp = (int)conn.InsertAndGetID(
+                        new MyRow
+                            {
+                                SenderId = senderId,
+                                RecipientId = receiverId,
+                                Content = messageContent.TrimEnd()
+                            }
+                       );
+
+                    uow.Commit();
+                }
+                if (resp < 0)
+                    return null;
+
+                row = conn.ById<MyRow>(resp);
+            }
+            return row;
         }
 
         public ListResponse<MyRow> ListWithoutConnection(IConfiguration config)
