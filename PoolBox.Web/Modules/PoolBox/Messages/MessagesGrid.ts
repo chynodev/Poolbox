@@ -20,6 +20,11 @@ namespace PoolBox.PoolBox {
         protected selectedUser: Administration.UserRow;
         protected loggedUser: Administration.UserRow;
         protected selectedInboxUserElement: HTMLElement;
+        protected readonly hubMethods = {
+            joinGroup: 'AddUserToGroupAsync',
+            sendMessage: 'SendMessage',
+            receiveMessage: 'ReceiveMessage'
+        };
 
         constructor(container: JQuery) {
             super(container);
@@ -29,7 +34,7 @@ namespace PoolBox.PoolBox {
             this.elements.grid.appendChild(this.elements.chatContainer);
             this.setTitle("Inbox");
             this.getLoggedUser();
-            this.users = Administration.UserRow.getLookup().items.filter(x => x.Username != 'admin');
+            this.users = Administration.UserRow.getLookup().items;//.filter(x => x.Username != 'admin');
             this.setEvents();
             this.fetchUserMessages();
             this.initTemplateElements();
@@ -120,6 +125,8 @@ namespace PoolBox.PoolBox {
             this.setFindUserInputOnChangeAction();
             this.setUserItemOnClickAction();
             this.setFindUserContainerChildrenOnBlurAction();
+            this.setSendBtnOnClickAction();
+            this.setOnReceiveAction();
         }
 
         protected populateInboxList() {
@@ -145,10 +152,12 @@ namespace PoolBox.PoolBox {
             inboxListitems.forEach((item, idx) => {
                 let itemElement = this.createInboxItem(item);
 
-                if (idx == 0)
+                if (idx == 0) 
                     this.selectInboxUser(itemElement);
+
                 this.elements.inboxListContainer.appendChild(itemElement);
             });
+            this.elements.chatContainer.style.visibility = 'visible';
         }
 
         protected createInboxItem(item: InboxListItem): HTMLElement {
@@ -171,6 +180,7 @@ namespace PoolBox.PoolBox {
             this.selectedInboxUserElement = itemElement;
             itemElement.classList.add('selected-message');
 
+            let oldUsername = this.selectedUser?.Username;
             let selectedUsername = itemElement.getAttribute('username');
             this.selectedUser = Q.tryFirst(this.users, x => x.Username == selectedUsername);
             
@@ -178,10 +188,40 @@ namespace PoolBox.PoolBox {
                 this.elements.messagesListContainer.removeChild(this.elements.messagesListContainer.lastElementChild);
             }
             this.displayMessages();
+
+            connection
+                .invoke(this.hubMethods.joinGroup, oldUsername, this.selectedUser.Username)
+                .catch(err => console.error(err.toString()));
         }
 
         protected sendMessage() {
-            
+            let messageContent = this.elements.messageInput.value;
+            if (!messageContent)
+                return;
+
+            connection
+                .invoke(this.hubMethods.sendMessage, this.selectedUser.Username, messageContent)
+                .catch(err => console.error(err.toString()));
+
+            this.elements.messageInput.value = '';
+        }
+
+        protected setOnReceiveAction() {
+            connection.on(this.hubMethods.receiveMessage, (response: string) => {
+                var respObject = JSON.parse(response);
+                var receiverName = respObject.receiverName;
+                var message = respObject.message as MessagesRow;
+
+                let isSender = receiverName != this.loggedUser.Username;
+
+                this.appendMessage(message, isSender);
+             });
+        }
+
+        protected setSendBtnOnClickAction() {
+            this.elements.sendBtn.addEventListener('click', () => {
+                this.sendMessage();
+            });
         }
 
         protected displayMessages() {
@@ -204,6 +244,8 @@ namespace PoolBox.PoolBox {
                 else if (getUserPairRelationshipType(msg) == 2)
                     this.appendMessage(msg);
             }, this);
+
+            this.elements.messagesListContainer.scrollTop = this.elements.messagesListContainer.scrollHeight;
         }
 
         protected appendMessage(message: MessagesRow, isLoggedUserSender: boolean = false) {
@@ -214,6 +256,7 @@ namespace PoolBox.PoolBox {
                 let messageElement = this.createMessageElement(message, this.theirMsgTemplateElement)
                 this.elements.messagesListContainer.appendChild(messageElement)
             }
+            this.elements.messagesListContainer.scrollTop = this.elements.messagesListContainer.scrollHeight;
         }
 
         protected createMessageElement(message: MessagesRow, templateNode: HTMLElement): HTMLElement {
@@ -265,5 +308,7 @@ namespace PoolBox.PoolBox {
         public findUserInput = document.querySelector('#find-user-input') as HTMLInputElement;
         public messagesListContainer = document.querySelector('#messages-list') as HTMLElement;
         public inboxListContainer = document.querySelector('#inbox-list') as HTMLInputElement;
+        public messageInput = document.querySelector('#message-input') as HTMLInputElement;
+        public sendBtn = document.querySelector('#msg-send-btn') as HTMLInputElement;
     }
 }

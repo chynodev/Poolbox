@@ -1,4 +1,5 @@
-﻿using Serenity;
+﻿using PoolBox.Administration;
+using Serenity;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
@@ -10,8 +11,8 @@ namespace PoolBox.PoolBox.Entities
 {
     [ConnectionKey("Default"), Module("PoolBox"), TableName("[dbo].[TRANSLATIONS]")]
     [DisplayName("Translations"), InstanceName("Translations")]
-    [ReadPermission("Administration:General")]
-    [ModifyPermission("Administration:General")]
+    [ReadPermission(PermissionKeys.TranslationsRead)]
+    [ModifyPermission(PermissionKeys.TranslationsWrite)]
     public sealed class TranslationsRow : Row<TranslationsRow.RowFields>, IIdRow, INameRow
     {
         [DisplayName("Tr Id"), Column("TR_ID"), Identity, IdProperty]

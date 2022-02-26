@@ -73,7 +73,27 @@ namespace PoolBox.Common.Repositories
                 fld.Name == request.Name);
 
             if (row == null)
+            {
+                if(request.PreferenceType == UserPreferenceConstants.LANGUAGE_PAIR_PREFERENCE
+                    && request.Name == UserPreferenceConstants.LANGUAGE_PAIR_ID) 
+                {
+                    using (var uow = new UnitOfWork(connection))
+                    {
+                        Update(
+                            uow,
+                            new UserPreferenceUpdateRequest
+                            {
+                                Name = UserPreferenceConstants.LANGUAGE_PAIR_ID,
+                                PreferenceType = UserPreferenceConstants.LANGUAGE_PAIR_PREFERENCE,
+                                Value = "1"
+                            }
+                        );
+                        uow.Commit();
+                        return new UserPreferenceRetrieveResponse { Value = "1" };
+                    }
+                }
                 return new UserPreferenceRetrieveResponse();
+            }
 
             return new UserPreferenceRetrieveResponse
             {

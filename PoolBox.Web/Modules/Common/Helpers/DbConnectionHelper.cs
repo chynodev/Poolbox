@@ -7,14 +7,16 @@ namespace PoolBox.Common
     {
         public static string CONNECTION_STRING_PATH => "Data:Default:ConnectionString";
         public static string PROVIDER_NAME_PATH => "Data:Default:ProviderName";
+        public static string CONNECTION_STRING;
+        public static string PROVIDER_NAME;
 
         public static DefaultSqlConnections GetDefaultSqlConnections(IConfiguration configuration)
         {
             var connectionOptions = new ConnectionStringOptions();
             var connectionEntry = new ConnectionStringEntry
             {
-                ConnectionString = configuration[CONNECTION_STRING_PATH],
-                ProviderName = configuration[PROVIDER_NAME_PATH]
+                ConnectionString = configuration?[CONNECTION_STRING_PATH] ?? CONNECTION_STRING,
+                ProviderName = configuration?[PROVIDER_NAME_PATH] ?? PROVIDER_NAME
             };
             connectionOptions.Add("Default", connectionEntry);
 

@@ -1,4 +1,5 @@
-﻿using PoolBox.Administration.Entities;
+﻿using PoolBox.Administration;
+using PoolBox.Administration.Entities;
 using Serenity;
 using Serenity.ComponentModel;
 using Serenity.Data;
@@ -11,11 +12,11 @@ namespace PoolBox.PoolBox.Entities
 {
     [ConnectionKey("Default"), Module("PoolBox"), TableName("[dbo].[MESSAGES]")]
     [DisplayName("Messages"), InstanceName("Messages")]
-    [ReadPermission("Administration:General")]
-    [ModifyPermission("Administration:General")]
+    [ReadPermission(PermissionKeys.TranslationsRead)]
+    [ModifyPermission(PermissionKeys.TranslationsWrite)]
     public sealed class MessagesRow : Row<MessagesRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("Id"), Column("ID"), NotNull, IdProperty]
+        [DisplayName("Id"), Column("ID"), IdProperty]
         public Int32? Id
         {
             get => fields.Id[this];
@@ -71,14 +72,14 @@ namespace PoolBox.PoolBox.Entities
             set => fields.Content[this] = value;
         }
 
-        [DisplayName("Is Read"), Column("IS_READ"), NotNull]
+        [DisplayName("Is Read"), Column("IS_READ")]
         public Int16? IsRead
         {
             get => fields.IsRead[this];
             set => fields.IsRead[this] = value;
         }
 
-        [DisplayName("Sent Date"), Column("SENT_DATE"), NotNull]
+        [DisplayName("Sent Date"), Column("SENT_DATE")]
         public DateTime? SentDate
         {
             get => fields.SentDate[this];
