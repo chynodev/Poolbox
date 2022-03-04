@@ -6,6 +6,7 @@ using Serenity.Data;
 using Serenity.Services;
 using System;
 using System.Data;
+using System.Linq;
 using MyRow = PoolBox.PoolBox.Entities.MessagesRow;
 
 namespace PoolBox.PoolBox.Repositories
@@ -47,7 +48,7 @@ namespace PoolBox.PoolBox.Repositories
         public MyRow CreateWithoutConnection(string senderName, string receiverName, string messageContent)
         {
             MyRow row = null;
-            int resp;
+            int newRowId;
 
             var sqlConnStrings = Common.DbConnectionHelper.GetDefaultSqlConnections(null);
             using (var conn = sqlConnStrings.NewByKey("Default"))
@@ -57,7 +58,7 @@ namespace PoolBox.PoolBox.Repositories
 
                 using (var uow = new UnitOfWork(conn))
                 {
-                    resp = (int)conn.InsertAndGetID(
+                    newRowId = (int)conn.InsertAndGetID(
                         new MyRow
                             {
                                 SenderId = senderId,
@@ -68,10 +69,12 @@ namespace PoolBox.PoolBox.Repositories
 
                     uow.Commit();
                 }
-                if (resp < 0)
+                if (newRowId < 0)
                     return null;
 
-                row = conn.ById<MyRow>(resp);
+                row = conn.ById<MyRow>(newRowId);
+                row.RecipientName = conn.ById<Administration.Entities.UserRow>(row.RecipientId).Username;
+                row.SenderName = conn.ById<Administration.Entities.UserRow>(row.SenderId).Username;
             }
             return row;
         }

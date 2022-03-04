@@ -60,8 +60,6 @@ namespace PoolBox.Hubs
                 messageContent
             );
             messageRow.SenderDisplayName = null;
-            messageRow.SenderName = null;
-            messageRow.RecipientName = null;
             messageRow.RecipientDisplayName = null;
             
             if (messageRow != null)
