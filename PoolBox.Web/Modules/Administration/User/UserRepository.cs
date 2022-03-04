@@ -94,6 +94,8 @@ namespace PoolBox.Administration.Repositories
                 ).FirstOrDefault();
         }
 
+        public string GetLoggedUsername => Context.User.Identity.Name;
+
         public static string ValidateDisplayName(string displayName, ITextLocalizer localizer)
         {
             displayName = displayName.TrimToNull();

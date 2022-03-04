@@ -62,7 +62,8 @@ namespace PoolBox.PoolBox {
                 userListCont.style.display = 'block';
                 interface userDto { displayName: string; username: string };
 
-                let filteredUsers: userDto[] = self.users
+                let users = self.users.filter(x => x.Username != self.loggedUser.Username);
+                let filteredUsers: userDto[] = users
                     .filter
                     (x => x.DisplayName.toLowerCase().isSubstr(inputVal.toLowerCase()))
                     .map(x => ({ displayName: x.DisplayName, username: x.Username } as userDto));
@@ -93,16 +94,42 @@ namespace PoolBox.PoolBox {
         }
 
         protected setUserItemOnClickAction() {
-            this.elements.userListContainer.addEventListener('click', (e: PointerEvent) => {
+            const clickEvent = (e: PointerEvent) => {
                 let target = (e.target as HTMLElement);
-                if (target.classList.contains('user-list-item'))
-                    console.log(target.getAttribute('username'));
+                if (target.classList.contains('user-list-item')) {
+                    let selectedUser = Q.tryFirst(this.users, x => x.Username == target.getAttribute('username'));
+                    let itemElement;
 
+                    if (selectedUser && selectedUser.Username != this.selectedUser.Username) {
+                        if (!this.getInboxElementByUsername(selectedUser.Username)) {
+                            itemElement = this.createInboxItem({
+                                msgUser: selectedUser,
+                                lastMessage: null
+                            });
+                            this.selectInboxUser(itemElement);
+                        } else {
+                            itemElement = this.getInboxElementByUsername(selectedUser.Username);
+                            this.selectInboxUser(itemElement);
+                        }
+                        this.elements.inboxListContainer.appendChild(itemElement);
+                    }
+                }
                 this.elements.userListContainer.style.display = 'none';
                 this.elements.findUserInput.value = '';
-                // TODO: Fetch messages
-            });
+            };
+
+            this.elements.userListContainer.addEventListener('click', clickEvent.bind(this));
         }
+
+        protected getInboxElementByUsername(username: string): HTMLElement {
+            let result;
+
+            this.elements.inboxListContainer.childNodes.forEach((child: HTMLElement) => {
+                if (child.getAttribute && child.getAttribute('username') == username)
+                    result = child;
+            });
+            return result;
+        } 
 
         protected fetchUserMessages() {
             MessagesService.List(
@@ -145,10 +172,10 @@ namespace PoolBox.PoolBox {
                     msgUser: Q.tryFirst(this.users, user => user.Username == username),
                     lastMessage: this.allUserMessages
                         .filter(x => [x.SenderName, x.RecipientName].indexOf(username) > -1)
-                        .reduce((x, y) => new Date(x.SentDate) < new Date(y.SentDate) ? x : y)
+                        .reduce((x, y) => new Date(x.SentDate) > new Date(y.SentDate) ? x : y)
                 }); 
             });
-
+            inboxListitems = inboxListitems.sort((x, y) => new Date(x.lastMessage.SentDate) > new Date(x.lastMessage.SentDate) ? -1 : 1);
             inboxListitems.forEach((item, idx) => {
                 let itemElement = this.createInboxItem(item);
 
@@ -163,10 +190,13 @@ namespace PoolBox.PoolBox {
         protected createInboxItem(item: InboxListItem): HTMLElement {
             let itemElement = this.inboxListItemTemplateElement.cloneNode(true) as HTMLElement;
             itemElement.querySelector('.username').innerHTML = item.msgUser.DisplayName;
-            let month = new Date(item.lastMessage.SentDate).getMonthString();
-            let day = new Date(item.lastMessage.SentDate).getDay();
-            itemElement.querySelector('.last-msg-date').innerHTML = month + ' ' + day;
-            itemElement.querySelector('.inbox-message').innerHTML = item.lastMessage.Content;
+
+            if (item.lastMessage) {
+                let month = new Date(item.lastMessage.SentDate).getMonthString();
+                let day = new Date(item.lastMessage.SentDate).getDay();
+                itemElement.querySelector('.last-msg-date').innerHTML = month + ' ' + day;
+                itemElement.querySelector('.inbox-message').innerHTML = item.lastMessage.Content;
+            }
             itemElement.setAttribute('username', item.msgUser.Username);
             itemElement.addEventListener('click', (e: PointerEvent) => {
                 this.selectInboxUser(itemElement);
@@ -194,6 +224,27 @@ namespace PoolBox.PoolBox {
                 .catch(err => console.error(err.toString()));
         }
 
+        protected updateInboxItemMessageContent(msg: MessagesRow) {
+            let inboxItem;
+
+            let items = Array.prototype.slice.call(this.elements.inboxListContainer.children);
+
+            for (let item of items) {
+                if (inboxItem) continue;
+
+                let element = item as HTMLElement;
+                if (element.getAttribute('username') == msg.RecipientName || element.getAttribute('username') == msg.SenderName)
+                    inboxItem = element;
+            }
+            if (this.elements.inboxListContainer.firstChild != inboxItem) 
+                this.elements.inboxListContainer.insertBefore(inboxItem, this.elements.inboxListContainer.firstChild);
+
+            let month = new Date(msg.SentDate).getMonthString();
+            let day = new Date(msg.SentDate).getDay();
+            inboxItem.querySelector('.last-msg-date').innerHTML = month + ' ' + day;
+            inboxItem.querySelector('.inbox-message').innerHTML = msg.Content;
+        }
+
         protected sendMessage() {
             let messageContent = this.elements.messageInput.value;
             if (!messageContent)
@@ -213,9 +264,9 @@ namespace PoolBox.PoolBox {
                 var message = respObject.message as MessagesRow;
 
                 let isSender = receiverName != this.loggedUser.Username;
-
                 this.appendMessage(message, isSender);
-             });
+                this.updateInboxItemMessageContent(message);
+            });
         }
 
         protected setSendBtnOnClickAction() {
