@@ -86,7 +86,7 @@ namespace PoolBox.PoolBox {
         protected setFindUserContainerChildrenOnBlurAction() {
             document.addEventListener('click', (e: PointerEvent) => {
                 let target = (e.target as HTMLElement);
-                if (target.parentElement.id != 'find-user-container') {
+                if (target?.parentElement?.id != 'find-user-container') {
                     this.elements.userListContainer.style.display = 'none';
                     this.elements.findUserInput.value = '';
                 }
@@ -154,6 +154,7 @@ namespace PoolBox.PoolBox {
             this.setFindUserContainerChildrenOnBlurAction();
             this.setSendBtnOnClickAction();
             this.setOnReceiveAction();
+            this.setSendVocabularyBtnOnClickAction();
         }
 
         protected populateInboxList() {
@@ -330,6 +331,15 @@ namespace PoolBox.PoolBox {
             return messageElement;
         }
 
+        protected setSendVocabularyBtnOnClickAction() {
+            const clickEvent = () => {
+                var dlg = new TranslationsSelectionDialog();
+                dlg.init();
+                dlg.dialogOpen();
+            };
+            this.elements.sendVocabularyBtn.addEventListener('click', clickEvent);
+        }
+
         // --override
         protected createQuickSearchInput(): void {
 
@@ -361,5 +371,6 @@ namespace PoolBox.PoolBox {
         public inboxListContainer = document.querySelector('#inbox-list') as HTMLInputElement;
         public messageInput = document.querySelector('#message-input') as HTMLInputElement;
         public sendBtn = document.querySelector('#msg-send-btn') as HTMLInputElement;
+        public sendVocabularyBtn = document.querySelector('#send-vocabulary-btn') as HTMLInputElement;
     }
 }

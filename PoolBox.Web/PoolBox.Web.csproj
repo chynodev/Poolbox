@@ -22,6 +22,8 @@
     <None Remove="Modules\PoolBox\DictionaryServices\IWordData.ts" />
     <None Remove="Modules\PoolBox\DictionaryServices\SpanishParser.ts" />
     <None Remove="Modules\PoolBox\Flashcards\FlashcardsGrid.ts" />
+    <None Remove="Modules\PoolBox\Messages\ShareVocabulary\TranslationsSelectionGrid.ts" />
+    <None Remove="Modules\PoolBox\Messages\TranslationsSelectionDialog.ts" />
     <None Remove="Modules\PoolBox\Reader\ReaderGrid.ts" />
     <None Remove="Modules\PoolBox\Reader\TextHighlighter.ts" />
     <None Remove="Modules\PoolBox\Flashcards\TranslationsDialog.ts" />
