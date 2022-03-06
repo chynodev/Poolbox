@@ -15,20 +15,25 @@ namespace PoolBox.PoolBox {
         private rowSelection: Serenity.GridRowSelectionMixin;
         protected isImportMode: boolean = false;
         protected errorColumn: Slick.Column;
+        protected sendMessageFunction: (wordIds: string) => void;
 
-        constructor(container: JQuery) {
+        constructor(container: JQuery, sendMessageFunction: (wordIds: string) => void) {
             super(container);
 
+            this.sendMessageFunction = sendMessageFunction;
             this.rowSelection = new Serenity.GridRowSelectionMixin(this);
             let currentLng = new Common.LanguagePairPreference().getItem();
         }
 
         // -- override
         protected getButtons(): Serenity.ToolButton[] {
+            let self = this;
             let buttons: Serenity.ToolButton[] = [];
             buttons.push({
                 title: 'Send selected words',
-                onClick: () => { console.log(this.rowSelection.getSelectedAsInt32()); },
+                onClick: () => {
+                    self.sendMessageFunction(self.rowSelection.getSelectedAsInt64().toString());
+                },
                 cssClass: 'mail-button'
             });
 

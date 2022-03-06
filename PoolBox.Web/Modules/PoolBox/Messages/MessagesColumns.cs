@@ -19,6 +19,7 @@ namespace PoolBox.PoolBox.Columns
         [EditLink]
         public String Content { get; set; }
         public Int16 IsRead { get; set; }
+        public Boolean IsVocabulary { get; set; }
         public DateTime SentDate { get; set; }
     }
 }

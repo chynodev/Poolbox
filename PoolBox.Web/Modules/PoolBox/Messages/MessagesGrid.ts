@@ -194,9 +194,12 @@ namespace PoolBox.PoolBox {
 
             if (item.lastMessage) {
                 let month = new Date(item.lastMessage.SentDate).getMonthString();
-                let day = new Date(item.lastMessage.SentDate).getDay();
+                let day = new Date(item.lastMessage.SentDate).getDate();
                 itemElement.querySelector('.last-msg-date').innerHTML = month + ' ' + day;
-                itemElement.querySelector('.inbox-message').innerHTML = item.lastMessage.Content;
+                if (item.lastMessage.IsVocabulary) 
+                    itemElement.querySelector('.inbox-message').append(this.getVocabularyIconElement());
+                else
+                    itemElement.querySelector('.inbox-message').innerHTML = item.lastMessage.Content;
             }
             itemElement.setAttribute('username', item.msgUser.Username);
             itemElement.addEventListener('click', (e: PointerEvent) => {
@@ -241,9 +244,15 @@ namespace PoolBox.PoolBox {
                 this.elements.inboxListContainer.insertBefore(inboxItem, this.elements.inboxListContainer.firstChild);
 
             let month = new Date(msg.SentDate).getMonthString();
-            let day = new Date(msg.SentDate).getDay();
+            let day = new Date(msg.SentDate).getDate();
             inboxItem.querySelector('.last-msg-date').innerHTML = month + ' ' + day;
-            inboxItem.querySelector('.inbox-message').innerHTML = msg.Content;
+
+            if (msg.IsVocabulary) {
+                inboxItem.querySelector('.inbox-message').innerHTML = '';
+                inboxItem.querySelector('.inbox-message').append(this.getVocabularyIconElement());
+            }
+            else
+                inboxItem.querySelector('.inbox-message').innerHTML = msg.Content;
         }
 
         protected sendMessage() {
@@ -252,10 +261,19 @@ namespace PoolBox.PoolBox {
                 return;
 
             connection
-                .invoke(this.hubMethods.sendMessage, this.selectedUser.Username, messageContent)
+                .invoke(this.hubMethods.sendMessage, this.selectedUser.Username, messageContent, false)
                 .catch(err => console.error(err.toString()));
 
             this.elements.messageInput.value = '';
+        }
+
+        protected sendVocabulary(wordIds: string) {
+            if (!wordIds)
+                return;
+
+            connection
+                .invoke(this.hubMethods.sendMessage, this.selectedUser.Username, wordIds, true)
+                .catch(err => console.error(err.toString()));
         }
 
         protected setOnReceiveAction() {
@@ -311,18 +329,46 @@ namespace PoolBox.PoolBox {
             this.elements.messagesListContainer.scrollTop = this.elements.messagesListContainer.scrollHeight;
         }
 
+        protected getVocabularyIconElement() {
+            let giftIcon = document.createElement('i');
+            giftIcon.classList.add('fa');
+            giftIcon.classList.add('fa-gift');
+
+            return giftIcon;
+        }
+
+        protected getVocabularyMessageIconElement() {
+            let giftIcon = this.getVocabularyIconElement();
+            giftIcon.style.cursor = 'pointer';
+            giftIcon.style.fontSize = '40px';
+
+            return giftIcon;
+        }
+
         protected createMessageElement(message: MessagesRow, templateNode: HTMLElement): HTMLElement {
             let messageContentClass = '.message-content';
             let messageTimeClass = '.message-time';
 
             let messageElement = templateNode.cloneNode(true) as HTMLElement;
-            messageElement.querySelector(messageContentClass).innerHTML = message.Content;
+            let messegaContentElement = messageElement.querySelector(messageContentClass);
+
+            if (message.IsVocabulary) {
+                messegaContentElement.append(this.getVocabularyMessageIconElement());
+                messegaContentElement.addEventListener('click', () => {
+                    if (this.loggedUser.Username == message.RecipientName) {
+                        // OPEN GRID DIALOG
+                        console.log('Unwrapping my gift!');
+                    }
+                });
+            }
+            else
+                messegaContentElement.innerHTML = message.Content;
 
             let hours = new Date(message.SentDate).getHours();
             let minutes = new Date(message.SentDate).getMinutes();
             let time = `${hours < 10 ? ('0' + hours) : hours}:${minutes < 10 ? ('0' + minutes) : minutes }`;
 
-            let day = new Date(message.SentDate).getDay();
+            let day = new Date(message.SentDate).getDate();
             let month = new Date(message.SentDate).getMonthString();
             let date = day + ' ' + month;
 
@@ -332,8 +378,9 @@ namespace PoolBox.PoolBox {
         }
 
         protected setSendVocabularyBtnOnClickAction() {
+            let self = this;
             const clickEvent = () => {
-                var dlg = new TranslationsSelectionDialog();
+                var dlg = new TranslationsSelectionDialog(self.sendVocabulary.bind(self));
                 dlg.init();
                 dlg.dialogOpen();
             };
