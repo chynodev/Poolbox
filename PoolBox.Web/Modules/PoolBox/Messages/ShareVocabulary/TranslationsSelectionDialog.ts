@@ -4,10 +4,10 @@
 
         protected grid: TranslationsSelectionGrid;
 
-        constructor() {
+        constructor(sendMessageFunction: (wordIds: string) => void) {
             super();
 
-            this.grid = new TranslationsSelectionGrid(this.element);
+            this.grid = new TranslationsSelectionGrid(this.element, sendMessageFunction);
         }
 
 

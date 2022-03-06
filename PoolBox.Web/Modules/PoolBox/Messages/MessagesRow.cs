@@ -79,6 +79,13 @@ namespace PoolBox.PoolBox.Entities
             set => fields.IsRead[this] = value;
         }
 
+        [DisplayName("Is Vocabulary"), Column("IS_VOCABULARY")]
+        public Boolean? IsVocabulary
+        {
+            get => fields.IsVocabulary[this];
+            set => fields.IsVocabulary[this] = value;
+        }
+
         [DisplayName("Sent Date"), Column("SENT_DATE")]
         public DateTime? SentDate
         {
@@ -103,6 +110,7 @@ namespace PoolBox.PoolBox.Entities
             public Int32Field RecipientId;
             public StringField Content;
             public Int16Field IsRead;
+            public BooleanField IsVocabulary;
             public DateTimeField SentDate;
 
             public StringField SenderName;

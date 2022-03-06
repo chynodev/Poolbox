@@ -45,7 +45,7 @@ namespace PoolBox.PoolBox.Repositories
             return new MyListHandler(Context).Process(connection, request);
         }
 
-        public MyRow CreateWithoutConnection(string senderName, string receiverName, string messageContent)
+        public MyRow CreateWithoutConnection(string senderName, string receiverName, string messageContent, bool isVocabulary)
         {
             MyRow row = null;
             int newRowId;
@@ -63,7 +63,8 @@ namespace PoolBox.PoolBox.Repositories
                             {
                                 SenderId = senderId,
                                 RecipientId = receiverId,
-                                Content = messageContent.TrimEnd()
+                                Content = messageContent.TrimEnd(),
+                                IsVocabulary = isVocabulary
                             }
                        );
 

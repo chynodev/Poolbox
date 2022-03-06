@@ -49,7 +49,7 @@ namespace PoolBox.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendMessage(string receiverName, string messageContent)
+        public async Task SendMessage(string receiverName, string messageContent, bool isVocabulary = false)
         {
             var groupName = GetGroupName(receiverName);
             var context = Context.GetHttpContext()?.RequestServices?.GetRequiredService<IRequestContext>();
@@ -57,7 +57,8 @@ namespace PoolBox.Hubs
             var messageRow = new MessagesRepository(context).CreateWithoutConnection(
                 Context.User.Identity.Name,
                 receiverName,
-                messageContent
+                messageContent,
+                isVocabulary
             );
             messageRow.SenderDisplayName = null;
             messageRow.RecipientDisplayName = null;
