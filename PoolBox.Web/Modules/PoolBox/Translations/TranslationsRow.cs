@@ -13,6 +13,7 @@ namespace PoolBox.PoolBox.Entities
     [DisplayName("Translations"), InstanceName("Translations")]
     [ReadPermission(PermissionKeys.TranslationsRead)]
     [ModifyPermission(PermissionKeys.TranslationsWrite)]
+    [LookupScript("PoolBox.Translations")]
     public sealed class TranslationsRow : Row<TranslationsRow.RowFields>, IIdRow, INameRow
     {
         [DisplayName("Tr Id"), Column("TR_ID"), Identity, IdProperty]
@@ -22,21 +23,21 @@ namespace PoolBox.PoolBox.Entities
             set => fields.TrId[this] = value;
         }
 
-        [DisplayName("Original"), Column("ORIGINAL"), Size(50), NotNull, QuickSearch, NameProperty]
+        [DisplayName("Original"), Column("ORIGINAL"), Size(50), NotNull, QuickSearch, NameProperty, LookupInclude]
         public String Original
         {
             get => fields.Original[this];
             set => fields.Original[this] = value;
         }
 
-        [DisplayName("Translated"), Column("TRANSLATED"), Size(150), NotNull]
+        [DisplayName("Translated"), Column("TRANSLATED"), Size(150), NotNull, LookupInclude]
         public String Translated
         {
             get => fields.Translated[this];
             set => fields.Translated[this] = value;
         }
 
-        [DisplayName("Pair"), Column("PAIR_ID"), NotNull, ForeignKey("[dbo].[LANGUAGE_PAIRS]", "PAIR_ID"), LeftJoin("jPair"), TextualField("PairTranslateFrom")]
+        [DisplayName("Pair"), Column("PAIR_ID"), ForeignKey("[dbo].[LANGUAGE_PAIRS]", "PAIR_ID"), LeftJoin("jPair"), TextualField("PairTranslateFrom"), LookupInclude]
         public Int64? PairId
         {
             get => fields.PairId[this];
@@ -58,7 +59,7 @@ namespace PoolBox.PoolBox.Entities
         }
 
 
-        [DisplayName("User ID"), Column("USER_ID"), NotNull, ForeignKey("[dbo].[Users]", "UserId"), LeftJoin("jUser")]
+        [DisplayName("User ID"), Column("USER_ID"), ForeignKey("[dbo].[Users]", "UserId"), LeftJoin("jUser"), LookupInclude]
         public Int32? UserId
         {
             get => fields.UserId[this];

@@ -30,7 +30,7 @@ namespace PoolBox.PoolBox.Entities
             set => fields.TranslateFrom[this] = value;
         }
 
-        [DisplayName("Translate To"), Column("TRANSLATE_TO"), Size(50), NotNull]
+        [DisplayName("Translate To"), Column("TRANSLATE_TO"), Size(50), NotNull, LookupInclude]
         public String TranslateTo
         {
             get => fields.TranslateTo[this];

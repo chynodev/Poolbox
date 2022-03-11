@@ -44,6 +44,24 @@ namespace PoolBox.PoolBox.Endpoints
         }
 
         [HttpPost, AuthorizeCreate(typeof(MyRow))]
+        public SaveResponse SaveReceivedVocabulary(IUnitOfWork uow, ListResponse<MyRow> request)
+        {
+            var repo = new MyRepository(Context);
+            
+            foreach (var row in request.Entities)
+            {
+                var newRow = new MyRow
+                {
+                    Original = row.Original,
+                    Translated = row.Translated,
+                    PairId = row.PairId
+                };
+                repo.Create(uow, new SaveRequest<MyRow> { Entity = newRow});
+            }
+            return new SaveResponse();
+        }
+
+        [HttpPost, AuthorizeCreate(typeof(MyRow))]
         public ListResponse<MyRow> CSVFileFormatAndCheck(IUnitOfWork uow, FileFormatRequest request)
         {
             return CSVFileFormatAndCheck(request);

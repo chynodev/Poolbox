@@ -20,9 +20,6 @@ namespace PoolBox.PoolBox.Repositories
 
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            request.Entity.UserId = Int32.Parse(Context.User.GetIdentifier());
-            request.Entity.PairId = 2;
-
             return new MySaveHandler(Context).Process(uow, request, SaveRequestType.Create);
         }
 
@@ -57,7 +54,9 @@ namespace PoolBox.PoolBox.Repositories
             {
                 base.BeforeSave();
 
-                Row.PairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
+                Row.UserId = Int32.Parse(Context.User.GetIdentifier());
+                if (!Row.PairId.HasValue)
+                    Row.PairId = LanguagePairsRepository.GetCurrentId(Connection, Context);
             }
         }
         
