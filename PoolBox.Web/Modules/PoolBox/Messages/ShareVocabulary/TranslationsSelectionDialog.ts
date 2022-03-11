@@ -2,17 +2,28 @@
     @Serenity.Decorators.registerClass()
     export class TranslationsSelectionDialog extends Serenity.TemplatedDialog<any> {
 
-        protected grid: TranslationsSelectionGrid;
+        public grid: TranslationsSelectionBaseGrid;
+        protected isSender: boolean;
 
-        constructor(sendMessageFunction: (wordIds: string) => void) {
+        constructor(sendMessageFunction: (data: string | TranslationsRow[]) => void, isSender: boolean = true, translationsIds: string = null) {
             super();
-
-            this.grid = new TranslationsSelectionGrid(this.element, sendMessageFunction);
+            
+            if (isSender)
+                this.grid = new TranslationsSelectionSenderGrid(this.element, sendMessageFunction, this);
+            else
+                this.grid = new TranslationsSelectionReceiverGrid(this.element, sendMessageFunction, this.fetchTranslations(translationsIds), this);
         }
 
+        protected fetchTranslations(translationsIds: string) {
+            let ids = translationsIds.split(',');
+            ids.forEach((x, idx) => ids[idx] = x.trim());
+
+            var items = TranslationsRow.getLookup().items.filter(x => ids.indexOf(x.TrId.toString()) > -1);
+            return items;
+        }
 
         protected getDialogTitle() {
-            return "Select translations";
+            return 'Select translations';
         }
 
     }

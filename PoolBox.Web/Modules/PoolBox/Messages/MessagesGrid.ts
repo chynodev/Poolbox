@@ -354,12 +354,8 @@ namespace PoolBox.PoolBox {
 
             if (message.IsVocabulary) {
                 messegaContentElement.append(this.getVocabularyMessageIconElement());
-                messegaContentElement.addEventListener('click', () => {
-                    if (this.loggedUser.Username == message.RecipientName) {
-                        // OPEN GRID DIALOG
-                        console.log('Unwrapping my gift!');
-                    }
-                });
+                if (this.loggedUser.Username == message.RecipientName)
+                    messegaContentElement.addEventListener('click', this.getGiftIconOnClickAction.bind(this, message.Content));
             }
             else
                 messegaContentElement.innerHTML = message.Content;
@@ -375,6 +371,20 @@ namespace PoolBox.PoolBox {
             messageElement.querySelector(messageTimeClass).innerHTML = time + ' | ' + date;
 
             return messageElement;
+        }
+
+        protected getGiftIconOnClickAction(messageContent) {
+            const saveReceivedVocabulary = (translations: TranslationsRow[]) => TranslationsService.SaveReceivedVocabulary(
+                { Entities: translations }
+            );
+
+            var dlg = new TranslationsSelectionDialog(
+                saveReceivedVocabulary.bind(this),
+                false,
+                messageContent
+            );
+            dlg.init();
+            dlg.dialogOpen();
         }
 
         protected setSendVocabularyBtnOnClickAction() {
