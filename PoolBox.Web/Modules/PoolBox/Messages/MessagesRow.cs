@@ -44,7 +44,7 @@ namespace PoolBox.PoolBox.Entities
             set => fields.SenderDisplayName[this] = value;
         }
 
-        [DisplayName("Recipient Id"), Column("RECIPIENT_ID"), NotNull, ForeignKey("[dbo].[Users]", "UserId", RowType = typeof(UserRow)), LeftJoin("jRecipient")]
+        [DisplayName("Recipient Id"), Column("RECIPIENT_ID"), ForeignKey("[dbo].[Users]", "UserId", RowType = typeof(UserRow)), LeftJoin("jRecipient")]
         public Int32? RecipientId
         {
             get => fields.RecipientId[this];
@@ -93,6 +93,13 @@ namespace PoolBox.PoolBox.Entities
             set => fields.SentDate[this] = value;
         }
 
+        [DisplayName("Name"), NotMapped]
+        public String VocabularyName
+        {
+            get => fields.VocabularyName[this];
+            set => fields.VocabularyName[this] = value;
+        }
+
         public MessagesRow()
             : base()
         {
@@ -117,6 +124,7 @@ namespace PoolBox.PoolBox.Entities
             public StringField RecipientName;
             public StringField SenderDisplayName;
             public StringField RecipientDisplayName;
+            public StringField VocabularyName;
         }
     }
 }

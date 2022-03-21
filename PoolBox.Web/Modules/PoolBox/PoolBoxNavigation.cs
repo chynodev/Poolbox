@@ -7,4 +7,5 @@ using MyPages = PoolBox.PoolBox.Pages;
 [assembly: NavigationLink(130, "PoolBox/Flashcards", typeof(MyPages.FlashcardsController), icon: null)]
 [assembly: NavigationLink(140, "PoolBox/Language Pairs", typeof(MyPages.LanguagePairsController), Permission = PermissionKeys.Security)]
 //[assembly: NavigationLink(int.MaxValue, "PoolBox/User Languages", typeof(MyPages.UserLanguagesController), icon: null)]
-[assembly: NavigationLink(int.MaxValue, "PoolBox/Inbox", typeof(MyPages.MessagesController), icon: null)]
+[assembly: NavigationLink(150, "PoolBox/Inbox", typeof(MyPages.MessagesController), icon: null)]
+[assembly: NavigationLink(160, "PoolBox/Library", typeof(MyPages.LibraryController), icon: null)]

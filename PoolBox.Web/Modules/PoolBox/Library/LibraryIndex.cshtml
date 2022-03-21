@@ -1,0 +1,27 @@
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer.Get("Db.PoolBox.Translations.EntityPlural");
+}
+
+<div id="GridDiv"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.2/signalr.min.js" integrity="sha512-p33jxSukh3bn9FLyjBanfbuA7YgjDhW6TiXfBE6Ju3BR75a3xxGqJpOqLrEiR5MndZEmHfNIiUUl+OIlvStfRw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.2/signalr.js" integrity="sha512-NfXuv1HQy5rC1BBtUzBEvZ0QPjrNqF86t7g64d28OQATwMMBW05lju2smR3ZySiuGYKS+wKmMXpFxD/NYsErLg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script type="text/javascript">
+    var connection = new signalR
+        .HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .withAutomaticReconnect()
+        .build();
+
+    connection.start().then(function () {
+        jQuery(function () {
+            new PoolBox.PoolBox.LibraryGrid($('#GridDiv'), {}).init();
+
+            Q.initFullHeightGridPage($('#GridDiv'));
+        });
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+</script>

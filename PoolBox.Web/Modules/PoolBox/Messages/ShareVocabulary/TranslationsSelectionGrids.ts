@@ -11,10 +11,10 @@ namespace PoolBox.PoolBox {
         protected getService() { return TranslationsService.baseUrl; }
 
         protected rowSelection: Serenity.GridRowSelectionMixin;
-        protected confirmOnClickAction: (data: string | TranslationsRow[]) => void;
+        protected confirmOnClickAction: (data: string | TranslationsRow[], vocabularyName: string) => void;
         protected dialog: TranslationsSelectionDialog
 
-        constructor(container: JQuery, sendMessageFunction: (wordIds) => void, dialog: TranslationsSelectionDialog) {
+        constructor(container: JQuery, sendMessageFunction: (wordIds: string | {}[], vocabularyName: string) => void, dialog: TranslationsSelectionDialog) {
             super(container);
 
             this.confirmOnClickAction = sendMessageFunction;
@@ -37,11 +37,9 @@ namespace PoolBox.PoolBox {
 
     @Serenity.Decorators.registerClass()
     export class TranslationsSelectionSenderGrid extends TranslationsSelectionBaseGrid {
-
         constructor(container: JQuery, sendMessageFunction: (wordIds: string) => void, dialog: TranslationsSelectionDialog) {
             super(container, sendMessageFunction, dialog);
         }
-
         // -- override
         protected getButtons(): Serenity.ToolButton[] {
             let self = this;
@@ -49,7 +47,7 @@ namespace PoolBox.PoolBox {
             buttons.push({
                 title: 'Send selected words',
                 onClick: () => {
-                    self.confirmOnClickAction(self.rowSelection.getSelectedAsInt64().toString());
+                    self.confirmOnClickAction(self.rowSelection.getSelectedAsInt64().toString(), null);
                     self.dialog.dialogClose();
                 },
                 cssClass: 'mail-button'
@@ -60,11 +58,54 @@ namespace PoolBox.PoolBox {
     }
 
     @Serenity.Decorators.registerClass()
+    export class LibraryTranslationsSelectionSenderGrid extends TranslationsSelectionBaseGrid {
+        constructor(container: JQuery, sendMessageFunction: (wordIds: string, vocabularyName: string) => void, dialog: TranslationsSelectionDialog) {
+            super(container, sendMessageFunction, dialog);
+            this.insertNameInputElementBeforeGrid();
+        }
+
+        protected insertNameInputElementBeforeGrid() {
+            let formGroup = document.createElement('div');
+            let nameLabel = document.createElement('label');
+            let nameInput = document.createElement('input');
+
+            nameInput.id = 'name-input';
+            nameLabel.textContent = 'Name';
+
+            formGroup.classList.add('form-group');
+            nameLabel.setAttribute('for', 'name-input');
+            nameInput.classList.add('form-control');
+            nameInput.setAttribute('placeholder', 'Enter vocabulary name');
+
+            formGroup.appendChild(nameLabel);
+            formGroup.appendChild(nameInput);
+            formGroup.style.maxWidth = '300px';
+            formGroup.style.fontWeight = '600';
+
+            this.element[0].insertBefore(formGroup, this.element[0].querySelector('.grid-toolbar'))
+        }
+
+        // -- override
+        protected getButtons(): Serenity.ToolButton[] {
+            let self = this;
+            let buttons: Serenity.ToolButton[] = [];
+            buttons.push({
+                title: 'Upload selected words',
+                onClick: () => {
+                    self.confirmOnClickAction(self.rowSelection.getSelectedAsInt64().toString(), $('#name-input').val());
+                    self.dialog.dialogClose();
+                }
+            });
+            return buttons;
+        }
+    }
+
+    @Serenity.Decorators.registerClass()
     export class TranslationsSelectionReceiverGrid extends TranslationsSelectionBaseGrid {
 
         protected myRows: TranslationsRow[] = [];
 
-        constructor(container: JQuery, saveVocabulary: (wordIds: TranslationsRow[]) => void, rows: TranslationsRow[], dialog: TranslationsSelectionDialog) {
+        constructor(container: JQuery, saveVocabulary: (wordIds: TranslationsRow[], kako: string) => void, rows: TranslationsRow[], dialog: TranslationsSelectionDialog) {
             super(container, saveVocabulary, dialog);
 
             this.myRows = rows;
@@ -91,7 +132,7 @@ namespace PoolBox.PoolBox {
                 onClick: () => {
                     let selectedRows = self.myRows.filter(x => self.rowSelection.getSelectedAsInt64().indexOf(x.TrId) > -1);
 
-                    self.confirmOnClickAction(selectedRows);
+                    self.confirmOnClickAction(selectedRows, null);
                     self.dialog.dialogClose();
                 },
                 cssClass: 'apply-changes-button'

@@ -69,5 +69,20 @@ namespace PoolBox.Hubs
                 await Clients.Group(groupName).SendAsync("ReceiveMessage", response);
             }
         }
+
+        public async Task UploadVocabulary(string messageContent)
+        {
+            var context = Context.GetHttpContext()?.RequestServices?.GetRequiredService<IRequestContext>();
+
+            var messageRow = new MessagesRepository(context).CreateWithoutConnection(
+                Context.User.Identity.Name,
+                null,
+                messageContent,
+                true
+            );
+
+            if (messageRow != null)
+                await Clients.All.SendAsync("UpdateLibraryFeed");
+        }
     }
 }
