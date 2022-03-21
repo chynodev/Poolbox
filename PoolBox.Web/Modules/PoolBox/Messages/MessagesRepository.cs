@@ -54,7 +54,7 @@ namespace PoolBox.PoolBox.Repositories
             using (var conn = sqlConnStrings.NewByKey("Default"))
             {
                 var senderId = new UserRepository(Context).GetByUsername(conn, senderName).UserId;
-                var receiverId = new UserRepository(Context).GetByUsername(conn, receiverName).UserId;
+                var receiverId = new UserRepository(Context).GetByUsername(conn, receiverName)?.UserId;
 
                 using (var uow = new UnitOfWork(conn))
                 {
@@ -74,7 +74,8 @@ namespace PoolBox.PoolBox.Repositories
                     return null;
 
                 row = conn.ById<MyRow>(newRowId);
-                row.RecipientName = conn.ById<Administration.Entities.UserRow>(row.RecipientId).Username;
+                if(row.RecipientId != null)
+                    row.RecipientName = conn.ById<Administration.Entities.UserRow>(row.RecipientId)?.Username;
                 row.SenderName = conn.ById<Administration.Entities.UserRow>(row.SenderId).Username;
             }
             return row;
@@ -121,17 +122,17 @@ namespace PoolBox.PoolBox.Repositories
             {
             }
 
-            protected override void ApplyEqualityFilter(SqlQuery query)
-            {
-                base.ApplyEqualityFilter(query);
+            //protected override void ApplyEqualityFilter(SqlQuery query)
+            //{
+            //    base.ApplyEqualityFilter(query);
 
-                var userId = Context.User.GetIdentifier();
+            //    var userId = Context.User.GetIdentifier();
 
-                query.Where(
-                    new Criteria(MyRow.Fields.RecipientId) == userId
-                    || new Criteria(MyRow.Fields.SenderId) == userId
-                );
-            }
+            //    query.Where(
+            //        new Criteria(MyRow.Fields.RecipientId) == userId
+            //        || new Criteria(MyRow.Fields.SenderId) == userId
+            //    );
+            //}
         }
     }
 }
